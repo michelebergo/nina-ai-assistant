@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("NINA ai assistant")]
 [assembly: AssemblyDescription("AI-powered assistant for N.I.N.A. imaging suite")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("NINA Community")]
+[assembly: AssemblyCompany("Michele Bergo")]
 [assembly: AssemblyProduct("NINA AI Assistant Plugin")]
-[assembly: AssemblyCopyright("Copyright © 2026")]
+[assembly: AssemblyCopyright("Copyright © 2026 Michele Bergo")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
