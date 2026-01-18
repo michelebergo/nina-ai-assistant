@@ -4,8 +4,10 @@ using NINA.Plugin;
 using NINA.Plugin.Interfaces;
 using NINA.Profile.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using NINA.Plugin.AIAssistant.AI;
@@ -15,13 +17,17 @@ namespace NINA.Plugin.AIAssistant
     [Export(typeof(IPluginManifest))]
     public class AIAssistantPlugin : PluginBase, INotifyPropertyChanged
     {
-        private readonly IPluginOptionsAccessor pluginSettings;
         private readonly IProfileService profileService;
         private readonly AIService aiService;
+
+        public static AIAssistantPlugin? Instance { get; private set; }
 
         [ImportingConstructor]
         public AIAssistantPlugin(IProfileService profileService)
         {
+            Instance = this;
+            this.profileService = profileService;
+
             if (Settings.Default.UpdateSettings)
             {
                 Settings.Default.Upgrade();
@@ -29,232 +35,141 @@ namespace NINA.Plugin.AIAssistant
                 CoreUtil.SaveSettings(Settings.Default);
             }
 
-            this.pluginSettings = new PluginOptionsAccessor(profileService, Guid.Parse(this.Identifier));
-            this.profileService = profileService;
             this.aiService = new AIService();
 
-            // Initialize AI providers based on saved settings
-            _ = InitializeAIProvidersAsync();
+            // Initialize selected provider
+            _ = InitializeAIProviderAsync();
 
             Logger.Info("NINA AI Assistant Plugin loaded successfully");
         }
 
-        private async Task InitializeAIProvidersAsync()
+        private async Task InitializeAIProviderAsync()
         {
             try
             {
-                // Initialize GitHub Models provider if configured
-                if (GitHubEnabled && !string.IsNullOrEmpty(GitHubApiKey))
+                var config = GetCurrentProviderConfig();
+                if (config != null && !string.IsNullOrEmpty(config.ApiKey) || config?.Provider == AIProviderType.Ollama)
                 {
-                    var config = new AIProviderConfig
-                    {
-                        ProviderType = AIProviderType.GitHub,
-                        ApiKey = GitHubApiKey,
-                        ModelId = GitHubModelId,
-                        IsEnabled = true
-                    };
-                    await aiService.InitializeProviderAsync(config);
+                    await aiService.InitializeAsync(config);
                 }
-
-                // Initialize Microsoft Foundry provider if configured
-                if (FoundryEnabled && !string.IsNullOrEmpty(FoundryApiKey) && !string.IsNullOrEmpty(FoundryEndpoint))
-                {
-                    var config = new AIProviderConfig
-                    {
-                        ProviderType = AIProviderType.MicrosoftFoundry,
-                        ApiKey = FoundryApiKey,
-                        Endpoint = FoundryEndpoint,
-                        DeploymentName = FoundryDeploymentName,
-                        IsEnabled = true
-                    };
-                    await aiService.InitializeProviderAsync(config);
-                }
-
-                // Initialize Azure OpenAI provider if configured
-                if (AzureOpenAIEnabled && !string.IsNullOrEmpty(AzureOpenAIApiKey) && !string.IsNullOrEmpty(AzureOpenAIEndpoint))
-                {
-                    var config = new AIProviderConfig
-                    {
-                        ProviderType = AIProviderType.AzureOpenAI,
-                        ApiKey = AzureOpenAIApiKey,
-                        Endpoint = AzureOpenAIEndpoint,
-                        DeploymentName = AzureOpenAIDeploymentName,
-                        IsEnabled = true
-                    };
-                    await aiService.InitializeProviderAsync(config);
-                }
-
-                // Initialize OpenAI provider if configured
-                if (OpenAIEnabled && !string.IsNullOrEmpty(OpenAIApiKey))
-                {
-                    var config = new AIProviderConfig
-                    {
-                        ProviderType = AIProviderType.OpenAI,
-                        ApiKey = OpenAIApiKey,
-                        ModelId = OpenAIModelId,
-                        IsEnabled = true
-                    };
-                    await aiService.InitializeProviderAsync(config);
-                }
-
-                // Initialize Anthropic provider if configured
-                if (AnthropicEnabled && !string.IsNullOrEmpty(AnthropicApiKey))
-                {
-                    var config = new AIProviderConfig
-                    {
-                        ProviderType = AIProviderType.Anthropic,
-                        ApiKey = AnthropicApiKey,
-                        ModelId = AnthropicModelId,
-                        IsEnabled = true
-                    };
-                    await aiService.InitializeProviderAsync(config);
-                }
-
-                // Initialize Google AI provider if configured
-                if (GoogleAIEnabled && !string.IsNullOrEmpty(GoogleAIApiKey))
-                {
-                    var config = new AIProviderConfig
-                    {
-                        ProviderType = AIProviderType.GoogleAI,
-                        ApiKey = GoogleAIApiKey,
-                        ModelId = GoogleAIModelId,
-                        IsEnabled = true
-                    };
-                    await aiService.InitializeProviderAsync(config);
-                }
-
-                // Set active provider
-                aiService.SetActiveProvider(ActiveProviderType);
             }
             catch (Exception ex)
             {
-                Logger.Error($"Error initializing AI providers: {ex.Message}");
+                Logger.Error($"Failed to initialize AI provider: {ex.Message}");
             }
+        }
+
+        private AIProviderConfig? GetCurrentProviderConfig()
+        {
+            var provider = SelectedProvider;
+            
+            return provider switch
+            {
+                AIProviderType.GitHub => new AIProviderConfig
+                {
+                    Provider = AIProviderType.GitHub,
+                    ApiKey = GitHubApiKey,
+                    ModelId = GitHubModelId ?? "gpt-4o-mini"
+                },
+                AIProviderType.OpenAI => new AIProviderConfig
+                {
+                    Provider = AIProviderType.OpenAI,
+                    ApiKey = OpenAIApiKey,
+                    ModelId = OpenAIModelId ?? "gpt-4o-mini"
+                },
+                AIProviderType.Anthropic => new AIProviderConfig
+                {
+                    Provider = AIProviderType.Anthropic,
+                    ApiKey = AnthropicApiKey,
+                    ModelId = AnthropicModelId ?? "claude-sonnet-4-20250514"
+                },
+                AIProviderType.Google => new AIProviderConfig
+                {
+                    Provider = AIProviderType.Google,
+                    ApiKey = GoogleApiKey,
+                    ModelId = GoogleModelId ?? "gemini-1.5-flash"
+                },
+                AIProviderType.Ollama => new AIProviderConfig
+                {
+                    Provider = AIProviderType.Ollama,
+                    Endpoint = OllamaEndpoint ?? "http://localhost:11434",
+                    ModelId = OllamaModelId ?? "llama3.2"
+                },
+                AIProviderType.OpenRouter => new AIProviderConfig
+                {
+                    Provider = AIProviderType.OpenRouter,
+                    ApiKey = OpenRouterApiKey,
+                    ModelId = OpenRouterModelId ?? "meta-llama/llama-3.2-3b-instruct:free"
+                },
+                _ => null
+            };
         }
 
         public AIService GetAIService() => aiService;
 
-        public override Task Teardown()
+        /// <summary>
+        /// Reinitialize the AI service with current settings
+        /// </summary>
+        public async Task ReinitializeAsync()
         {
-            return base.Teardown();
+            await InitializeAIProviderAsync();
         }
+
+        /// <summary>
+        /// List of available providers for binding
+        /// </summary>
+        public List<AIProviderType> AvailableProviders => AvailableModels.GetAllProviders();
+
+        #region Provider Selection
+
+        public AIProviderType SelectedProvider
+        {
+            get
+            {
+                if (Enum.TryParse<AIProviderType>(Settings.Default.SelectedProvider, out var provider))
+                {
+                    return provider;
+                }
+                return AIProviderType.GitHub;
+            }
+            set
+            {
+                Settings.Default.SelectedProvider = value.ToString();
+                CoreUtil.SaveSettings(Settings.Default);
+                RaisePropertyChanged();
+                _ = InitializeAIProviderAsync();
+            }
+        }
+
+        #endregion
 
         #region GitHub Models Settings
 
-        public bool GitHubEnabled
+        public string? GitHubApiKey
         {
-            get => pluginSettings.GetValueBoolean(nameof(GitHubEnabled), false);
+            get => Settings.Default.GitHubApiKey;
             set
             {
-                pluginSettings.SetValueBoolean(nameof(GitHubEnabled), value);
+                Settings.Default.GitHubApiKey = value;
+                CoreUtil.SaveSettings(Settings.Default);
                 RaisePropertyChanged();
+                if (SelectedProvider == AIProviderType.GitHub)
+                    _ = InitializeAIProviderAsync();
             }
         }
 
-        public string GitHubApiKey
+        public string? GitHubModelId
         {
-            get => pluginSettings.GetValueString(nameof(GitHubApiKey), string.Empty);
-            set
+            get
             {
-                pluginSettings.SetValueString(nameof(GitHubApiKey), value);
-                RaisePropertyChanged();
+                var value = Settings.Default.GitHubModelId ?? "gpt-4o-mini";
+                value = SanitizeModelId(value);
+                return value;
             }
-        }
-
-        public string GitHubModelId
-        {
-            get => pluginSettings.GetValueString(nameof(GitHubModelId), "gpt-4o-mini");
             set
             {
-                pluginSettings.SetValueString(nameof(GitHubModelId), value);
-                RaisePropertyChanged();
-            }
-        }
-
-        #endregion
-
-        #region Microsoft Foundry Settings
-
-        public bool FoundryEnabled
-        {
-            get => pluginSettings.GetValueBoolean(nameof(FoundryEnabled), false);
-            set
-            {
-                pluginSettings.SetValueBoolean(nameof(FoundryEnabled), value);
-                RaisePropertyChanged();
-            }
-        }
-
-        public string FoundryApiKey
-        {
-            get => pluginSettings.GetValueString(nameof(FoundryApiKey), string.Empty);
-            set
-            {
-                pluginSettings.SetValueString(nameof(FoundryApiKey), value);
-                RaisePropertyChanged();
-            }
-        }
-
-        public string FoundryEndpoint
-        {
-            get => pluginSettings.GetValueString(nameof(FoundryEndpoint), string.Empty);
-            set
-            {
-                pluginSettings.SetValueString(nameof(FoundryEndpoint), value);
-                RaisePropertyChanged();
-            }
-        }
-
-        public string FoundryDeploymentName
-        {
-            get => pluginSettings.GetValueString(nameof(FoundryDeploymentName), string.Empty);
-            set
-            {
-                pluginSettings.SetValueString(nameof(FoundryDeploymentName), value);
-                RaisePropertyChanged();
-            }
-        }
-
-        #endregion
-
-        #region Azure OpenAI Settings
-
-        public bool AzureOpenAIEnabled
-        {
-            get => pluginSettings.GetValueBoolean(nameof(AzureOpenAIEnabled), false);
-            set
-            {
-                pluginSettings.SetValueBoolean(nameof(AzureOpenAIEnabled), value);
-                RaisePropertyChanged();
-            }
-        }
-
-        public string AzureOpenAIApiKey
-        {
-            get => pluginSettings.GetValueString(nameof(AzureOpenAIApiKey), string.Empty);
-            set
-            {
-                pluginSettings.SetValueString(nameof(AzureOpenAIApiKey), value);
-                RaisePropertyChanged();
-            }
-        }
-
-        public string AzureOpenAIEndpoint
-        {
-            get => pluginSettings.GetValueString(nameof(AzureOpenAIEndpoint), string.Empty);
-            set
-            {
-                pluginSettings.SetValueString(nameof(AzureOpenAIEndpoint), value);
-                RaisePropertyChanged();
-            }
-        }
-
-        public string AzureOpenAIDeploymentName
-        {
-            get => pluginSettings.GetValueString(nameof(AzureOpenAIDeploymentName), string.Empty);
-            set
-            {
-                pluginSettings.SetValueString(nameof(AzureOpenAIDeploymentName), value);
+                Settings.Default.GitHubModelId = SanitizeModelId(value);
+                CoreUtil.SaveSettings(Settings.Default);
                 RaisePropertyChanged();
             }
         }
@@ -263,32 +178,26 @@ namespace NINA.Plugin.AIAssistant
 
         #region OpenAI Settings
 
-        public bool OpenAIEnabled
+        public string? OpenAIApiKey
         {
-            get => pluginSettings.GetValueBoolean(nameof(OpenAIEnabled), false);
+            get => Settings.Default.OpenAIApiKey;
             set
             {
-                pluginSettings.SetValueBoolean(nameof(OpenAIEnabled), value);
+                Settings.Default.OpenAIApiKey = value;
+                CoreUtil.SaveSettings(Settings.Default);
                 RaisePropertyChanged();
+                if (SelectedProvider == AIProviderType.OpenAI)
+                    _ = InitializeAIProviderAsync();
             }
         }
 
-        public string OpenAIApiKey
+        public string? OpenAIModelId
         {
-            get => pluginSettings.GetValueString(nameof(OpenAIApiKey), string.Empty);
+            get => SanitizeModelId(Settings.Default.OpenAIModelId ?? "gpt-4o-mini");
             set
             {
-                pluginSettings.SetValueString(nameof(OpenAIApiKey), value);
-                RaisePropertyChanged();
-            }
-        }
-
-        public string OpenAIModelId
-        {
-            get => pluginSettings.GetValueString(nameof(OpenAIModelId), "gpt-4o-mini");
-            set
-            {
-                pluginSettings.SetValueString(nameof(OpenAIModelId), value);
+                Settings.Default.OpenAIModelId = SanitizeModelId(value);
+                CoreUtil.SaveSettings(Settings.Default);
                 RaisePropertyChanged();
             }
         }
@@ -297,86 +206,184 @@ namespace NINA.Plugin.AIAssistant
 
         #region Anthropic Settings
 
-        public bool AnthropicEnabled
+        public string? AnthropicApiKey
         {
-            get => pluginSettings.GetValueBoolean(nameof(AnthropicEnabled), false);
+            get => Settings.Default.AnthropicApiKey;
             set
             {
-                pluginSettings.SetValueBoolean(nameof(AnthropicEnabled), value);
+                Settings.Default.AnthropicApiKey = value;
+                CoreUtil.SaveSettings(Settings.Default);
                 RaisePropertyChanged();
+                if (SelectedProvider == AIProviderType.Anthropic)
+                    _ = InitializeAIProviderAsync();
             }
         }
 
-        public string AnthropicApiKey
+        public string? AnthropicModelId
         {
-            get => pluginSettings.GetValueString(nameof(AnthropicApiKey), string.Empty);
+            get => SanitizeModelId(Settings.Default.AnthropicModelId ?? "claude-3-5-sonnet-20241022");
             set
             {
-                pluginSettings.SetValueString(nameof(AnthropicApiKey), value);
-                RaisePropertyChanged();
-            }
-        }
-
-        public string AnthropicModelId
-        {
-            get => pluginSettings.GetValueString(nameof(AnthropicModelId), "claude-sonnet-4-5");
-            set
-            {
-                pluginSettings.SetValueString(nameof(AnthropicModelId), value);
+                Settings.Default.AnthropicModelId = SanitizeModelId(value);
+                CoreUtil.SaveSettings(Settings.Default);
                 RaisePropertyChanged();
             }
         }
 
         #endregion
 
-        #region Google AI Settings
+        #region Google Gemini Settings
 
-        public bool GoogleAIEnabled
+        public string? GoogleApiKey
         {
-            get => pluginSettings.GetValueBoolean(nameof(GoogleAIEnabled), false);
+            get => Settings.Default.GoogleApiKey;
             set
             {
-                pluginSettings.SetValueBoolean(nameof(GoogleAIEnabled), value);
+                Settings.Default.GoogleApiKey = value;
+                CoreUtil.SaveSettings(Settings.Default);
                 RaisePropertyChanged();
+                if (SelectedProvider == AIProviderType.Google)
+                    _ = InitializeAIProviderAsync();
             }
         }
 
-        public string GoogleAIApiKey
+        public string? GoogleModelId
         {
-            get => pluginSettings.GetValueString(nameof(GoogleAIApiKey), string.Empty);
+            get => SanitizeModelId(Settings.Default.GoogleModelId ?? "gemini-1.5-flash");
             set
             {
-                pluginSettings.SetValueString(nameof(GoogleAIApiKey), value);
-                RaisePropertyChanged();
-            }
-        }
-
-        public string GoogleAIModelId
-        {
-            get => pluginSettings.GetValueString(nameof(GoogleAIModelId), "gemini-pro");
-            set
-            {
-                pluginSettings.SetValueString(nameof(GoogleAIModelId), value);
+                Settings.Default.GoogleModelId = SanitizeModelId(value);
+                CoreUtil.SaveSettings(Settings.Default);
                 RaisePropertyChanged();
             }
         }
 
         #endregion
 
-        #region Active Provider
+        #region Ollama Settings
 
-        public AIProviderType ActiveProviderType
+        public string? OllamaEndpoint
         {
-            get => (AIProviderType)pluginSettings.GetValueInt32(nameof(ActiveProviderType), 0);
+            get => Settings.Default.OllamaEndpoint ?? "http://localhost:11434";
             set
             {
-                pluginSettings.SetValueInt32(nameof(ActiveProviderType), (int)value);
-                aiService.SetActiveProvider(value);
+                Settings.Default.OllamaEndpoint = value;
+                CoreUtil.SaveSettings(Settings.Default);
+                RaisePropertyChanged();
+                if (SelectedProvider == AIProviderType.Ollama)
+                    _ = InitializeAIProviderAsync();
+            }
+        }
+
+        public string? OllamaModelId
+        {
+            get => SanitizeModelId(Settings.Default.OllamaModelId ?? "llama3.2");
+            set
+            {
+                Settings.Default.OllamaModelId = SanitizeModelId(value);
+                CoreUtil.SaveSettings(Settings.Default);
                 RaisePropertyChanged();
             }
         }
 
         #endregion
+
+        #region OpenRouter Settings
+
+        public string? OpenRouterApiKey
+        {
+            get => Settings.Default.OpenRouterApiKey;
+            set
+            {
+                Settings.Default.OpenRouterApiKey = value;
+                CoreUtil.SaveSettings(Settings.Default);
+                RaisePropertyChanged();
+                if (SelectedProvider == AIProviderType.OpenRouter)
+                    _ = InitializeAIProviderAsync();
+            }
+        }
+
+        public string? OpenRouterModelId
+        {
+            get => SanitizeModelId(Settings.Default.OpenRouterModelId ?? "meta-llama/llama-3.2-3b-instruct:free");
+            set
+            {
+                Settings.Default.OpenRouterModelId = SanitizeModelId(value);
+                CoreUtil.SaveSettings(Settings.Default);
+                RaisePropertyChanged();
+            }
+        }
+
+        #endregion
+
+        #region MCP (Model Context Protocol) Settings
+
+        public bool MCPEnabled
+        {
+            get => Settings.Default.MCPEnabled;
+            set
+            {
+                Settings.Default.MCPEnabled = value;
+                CoreUtil.SaveSettings(Settings.Default);
+                RaisePropertyChanged();
+            }
+        }
+
+        public string MCPNinaHost
+        {
+            get => Settings.Default.MCPNinaHost ?? "localhost";
+            set
+            {
+                Settings.Default.MCPNinaHost = value;
+                CoreUtil.SaveSettings(Settings.Default);
+                RaisePropertyChanged();
+            }
+        }
+
+        public int MCPNinaPort
+        {
+            get => Settings.Default.MCPNinaPort;
+            set
+            {
+                Settings.Default.MCPNinaPort = value;
+                CoreUtil.SaveSettings(Settings.Default);
+                RaisePropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Get the MCP configuration
+        /// </summary>
+        public AI.MCP.MCPConfig GetMCPConfig()
+        {
+            return new AI.MCP.MCPConfig
+            {
+                Enabled = MCPEnabled,
+                NinaHost = MCPNinaHost,
+                NinaPort = MCPNinaPort
+            };
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private string SanitizeModelId(string? value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return "gpt-4o-mini";
+                
+            // Sanitize corrupted values from ComboBoxItem binding issue
+            if (value.Contains("system.windows.controls.comboboxitem:", StringComparison.OrdinalIgnoreCase))
+            {
+                value = value.Split(':').LastOrDefault()?.Trim() ?? "gpt-4o-mini";
+            }
+            return value;
+        }
+
+        #endregion
+
+        #region INotifyPropertyChanged
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -384,5 +391,7 @@ namespace NINA.Plugin.AIAssistant
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        #endregion
     }
 }

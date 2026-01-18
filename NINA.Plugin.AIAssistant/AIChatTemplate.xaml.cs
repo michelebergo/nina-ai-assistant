@@ -1,12 +1,13 @@
+using System;
 using System.ComponentModel.Composition;
 using System.Windows;
 
-namespace NINA.Plugin.AIAssistant.SequenceItems
+namespace NINA.Plugin.AIAssistant
 {
     [Export(typeof(ResourceDictionary))]
-    public partial class SequenceItemTemplates : ResourceDictionary
+    public partial class AIChatTemplate : ResourceDictionary
     {
-        public SequenceItemTemplates()
+        public AIChatTemplate()
         {
             InitializeComponent();
         }

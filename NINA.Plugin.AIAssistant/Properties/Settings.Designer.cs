@@ -24,5 +24,205 @@ namespace NINA.Plugin.AIAssistant.Properties {
                 this["UpdateSettings"] = value;
             }
         }
+
+        // Active Provider Selection
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("GitHub")]
+        public string SelectedProvider {
+            get {
+                return ((string)(this["SelectedProvider"]));
+            }
+            set {
+                this["SelectedProvider"] = value;
+            }
+        }
+
+        // GitHub Models Settings
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GitHubApiKey {
+            get {
+                return ((string)(this["GitHubApiKey"]));
+            }
+            set {
+                this["GitHubApiKey"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("gpt-4o-mini")]
+        public string GitHubModelId {
+            get {
+                return ((string)(this["GitHubModelId"]));
+            }
+            set {
+                this["GitHubModelId"] = value;
+            }
+        }
+
+        // OpenAI Settings
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string OpenAIApiKey {
+            get {
+                return ((string)(this["OpenAIApiKey"]));
+            }
+            set {
+                this["OpenAIApiKey"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("gpt-4o-mini")]
+        public string OpenAIModelId {
+            get {
+                return ((string)(this["OpenAIModelId"]));
+            }
+            set {
+                this["OpenAIModelId"] = value;
+            }
+        }
+
+        // Anthropic Settings
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AnthropicApiKey {
+            get {
+                return ((string)(this["AnthropicApiKey"]));
+            }
+            set {
+                this["AnthropicApiKey"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("claude-sonnet-4-20250514")]
+        public string AnthropicModelId {
+            get {
+                return ((string)(this["AnthropicModelId"]));
+            }
+            set {
+                this["AnthropicModelId"] = value;
+            }
+        }
+
+        // Google Gemini Settings
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string GoogleApiKey {
+            get {
+                return ((string)(this["GoogleApiKey"]));
+            }
+            set {
+                this["GoogleApiKey"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("gemini-1.5-flash")]
+        public string GoogleModelId {
+            get {
+                return ((string)(this["GoogleModelId"]));
+            }
+            set {
+                this["GoogleModelId"] = value;
+            }
+        }
+
+        // Ollama Settings (Local)
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:11434")]
+        public string OllamaEndpoint {
+            get {
+                return ((string)(this["OllamaEndpoint"]));
+            }
+            set {
+                this["OllamaEndpoint"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("llama3.2")]
+        public string OllamaModelId {
+            get {
+                return ((string)(this["OllamaModelId"]));
+            }
+            set {
+                this["OllamaModelId"] = value;
+            }
+        }
+
+        // OpenRouter Settings
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string OpenRouterApiKey {
+            get {
+                return ((string)(this["OpenRouterApiKey"]));
+            }
+            set {
+                this["OpenRouterApiKey"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("meta-llama/llama-3.2-3b-instruct:free")]
+        public string OpenRouterModelId {
+            get {
+                return ((string)(this["OpenRouterModelId"]));
+            }
+            set {
+                this["OpenRouterModelId"] = value;
+            }
+        }
+
+        // MCP (Model Context Protocol) Settings for NINA Advanced API
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool MCPEnabled {
+            get {
+                return ((bool)(this["MCPEnabled"]));
+            }
+            set {
+                this["MCPEnabled"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("localhost")]
+        public string MCPNinaHost {
+            get {
+                return ((string)(this["MCPNinaHost"]));
+            }
+            set {
+                this["MCPNinaHost"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1888")]
+        public int MCPNinaPort {
+            get {
+                return ((int)(this["MCPNinaPort"]));
+            }
+            set {
+                this["MCPNinaPort"] = value;
+            }
+        }
     }
 }

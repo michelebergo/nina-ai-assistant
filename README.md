@@ -1,237 +1,256 @@
-# NINA AI Assistant Plugin
+<p align="center">
+  <img src="assets/icon.svg" alt="NINA AI Assistant" width="200"/>
+</p>
 
-AI-powered features for [N.I.N.A. (Nighttime Imaging 'N' Astronomy)](https://nighttime-imaging.eu/) - bringing intelligent automation to your astrophotography workflow.
+<h1 align="center">NINA AI Assistant</h1>
 
-## 🌟 Features
+<p align="center">
+  <strong>🤖 AI-powered astrophotography assistant for N.I.N.A. with MCP equipment control</strong>
+</p>
 
-### Multi-Provider AI Support
-Support for both **free** and **paid** AI models from multiple providers:
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#configuration">Configuration</a> •
+  <a href="#mcp-integration">MCP Integration</a> •
+  <a href="#supported-providers">Providers</a> •
+  <a href="#contributing">Contributing</a>
+</p>
 
-#### Free Tier Available
-- **GitHub Models** - Free tier with models like GPT-4o-mini, Phi-4, Llama 3.3, Claude Sonnet 4.5
-- **Google AI** - Generous free tier with Gemini models
-
-#### Paid APIs
-- **Microsoft Foundry** (formerly Azure AI Foundry) - Enterprise-grade deployment
-- **Azure OpenAI** - Fully managed OpenAI on Azure
-- **OpenAI** - Direct API access to latest models
-- **Anthropic Claude** - Advanced reasoning capabilities
-
-### AI-Powered Sequence Items
-
-1. **AI Image Analysis**
-   - Automated quality assessment
-   - Star detection and tracking evaluation
-   - Focus quality analysis
-   - Recommendations for improvement
-
-2. **AI Suggest Exposure**
-   - Intelligent exposure time recommendations
-   - Target-specific guidance
-   - Sky condition considerations
-   - Sub-exposure count suggestions
-
-3. **AI Query Assistant**
-   - Ask any astrophotography question
-   - Get expert advice in real-time
-   - Learn best practices
-   - Troubleshooting assistance
-
-## 📋 Requirements
-
-- N.I.N.A. version 3.0 or later
-- .NET 8.0 Runtime
-- At least one configured AI provider (see Setup)
-
-## 🚀 Quick Start
-
-### Option 1: GitHub Models (Recommended for Getting Started) - FREE!
-
-1. **Get a GitHub Personal Access Token**
-   - Visit https://github.com/settings/tokens
-   - Click "Generate new token (classic)"
-   - Select scopes: Just basic access is fine
-   - Copy your token
-
-2. **Configure in NINA**
-   - Open NINA → Options → Equipment → Plugin Manager
-   - Find "AI Assistant" plugin
-   - Enable GitHub Models
-   - Paste your GitHub PAT
-   - Select a model (e.g., "gpt-4o-mini")
-   - Click Test Connection
-
-3. **Start Using**
-   - Go to Sequencer
-   - Add AI sequence items from "AI Assistant" category
-   - Run your sequence!
-
-### Option 2: Other Providers
-
-#### Microsoft Foundry
-1. Create a Foundry project at https://ai.azure.com
-2. Deploy a model
-3. Copy your endpoint and API key
-4. Configure in plugin settings
-
-#### OpenAI
-1. Get API key from https://platform.openai.com/api-keys
-2. Configure in plugin settings
-3. Select your preferred model
-
-#### Anthropic Claude
-1. Get API key from https://console.anthropic.com/
-2. Configure in plugin settings
-3. Select Claude model
-
-#### Google AI (Gemini)
-1. Get API key from https://makersuite.google.com/app/apikey
-2. Configure in plugin settings
-3. Select Gemini model
-
-## 💡 Usage Examples
-
-### Example 1: Quality Check Sequence
-```
-1. Take Exposure (Light, 300s)
-2. AI Image Analysis
-   - Prompt: "Analyze image quality, focus, and tracking. Rate from 1-10 and suggest improvements."
-3. Continue if quality is good, retry if issues found
-```
-
-### Example 2: Smart Exposure Planning
-```
-1. AI Suggest Exposure
-   - Target: M42
-   - Filter: Ha
-   - Sky Brightness: 20.5
-2. Use recommended settings for capture
-```
-
-### Example 3: Interactive Learning
-```
-1. AI Query Assistant
-   - Question: "What's the best way to image faint galaxies with my setup?"
-2. Follow AI recommendations
-```
-
-## 🎯 Supported Models
-
-### GitHub Models (Free Tier Available)
-- gpt-4o, gpt-4o-mini (OpenAI)
-- gpt-4.1, gpt-4.1-mini (OpenAI)
-- o1, o1-mini, o3-mini (OpenAI reasoning models)
-- claude-sonnet-4-5 (Anthropic)
-- llama-3.3-70b-instruct (Meta)
-- phi-4 (Microsoft)
-
-### Microsoft Foundry
-- gpt-5.2, gpt-5.1 (OpenAI latest)
-- claude-opus-4-5, claude-sonnet-4-5 (Anthropic)
-- o3, o1 (OpenAI reasoning)
-- All Foundry catalog models
-
-### Azure OpenAI
-- gpt-4o, gpt-4o-mini
-- gpt-4, gpt-3.5-turbo
-
-### OpenAI Direct
-- gpt-4o, gpt-4o-mini
-- gpt-4-turbo, gpt-4
-- o1-preview, o1-mini
-
-### Anthropic
-- claude-opus-4-5 (Most capable)
-- claude-sonnet-4-5 (Balanced)
-- claude-haiku-4-5 (Fastest)
-
-### Google AI
-- gemini-2.0-flash (Latest)
-- gemini-1.5-pro, gemini-1.5-flash
-
-## ⚙️ Configuration
-
-All settings are in NINA → Options → Equipment → Plugin Manager → AI Assistant:
-
-- **Active Provider**: Which AI service to use
-- **Provider Settings**: API keys, endpoints, model selection
-- **Multiple Providers**: Configure several, switch as needed
-
-## 🔒 Security & Privacy
-
-- API keys are stored in NINA's secure profile settings
-- No data is stored or logged by the plugin beyond NINA's normal logging
-- All AI requests go directly to your chosen provider
-- Review each provider's privacy policy and terms of service
-
-## 💰 Cost Considerations
-
-### Free Options
-- **GitHub Models**: Free tier with rate limits, upgrade for production
-- **Google AI**: Generous free tier for Gemini models
-
-### Paid Options
-Typical costs (January 2026):
-- **GPT-4o-mini**: ~$0.26 per 1M tokens (very affordable)
-- **GPT-4o**: ~$4.38 per 1M tokens
-- **Claude Sonnet**: ~$6 per 1M tokens
-- **Gemini Pro**: Varies by usage
-
-💡 **Tip**: Start with GitHub Models or Gemini free tier, then upgrade if needed!
-
-## 🐛 Troubleshooting
-
-### "Provider not initialized" error
-- Check that you've enabled the provider in settings
-- Verify API key is correct
-- Test connection in settings page
-
-### "No AI provider configured" error
-- Configure at least one provider in plugin settings
-- Restart NINA after configuration
-
-### High latency responses
-- Consider using faster models (e.g., gpt-4o-mini, claude-haiku)
-- Check your internet connection
-- Some reasoning models (o1, o3) are slower by design
-
-## 📝 Development
-
-### Building from Source
-```bash
-git clone https://github.com/yourusername/nina-ai-assistant
-cd nina-ai-assistant
-dotnet build
-```
-
-### Contributing
-Contributions welcome! Please:
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the Mozilla Public License 2.0 (MPL-2.0).
-
-## 🙏 Credits
-
-- N.I.N.A. Team for the amazing imaging software
-- All AI providers for their excellent APIs
-- Community contributors
-
-## 📞 Support
-
-- [GitHub Issues](https://github.com/michelebergo/nina-ai-assistant/issues)
-- [N.I.N.A. Discord](https://discord.gg/nighttime-imaging)
-
-## 🔗 Links
-
-- [N.I.N.A. Official Website](https://nighttime-imaging.eu/)
-- [Plugin Repository](https://github.com/michelebergo/nina-ai-assistant)
-- [GitHub Models](https://github.com/marketplace/models)
-- [Microsoft Foundry](https://ai.azure.com)
+<p align="center">
+  <img src="https://img.shields.io/badge/NINA-3.x-blue?style=flat-square" alt="NINA 3.x"/>
+  <img src="https://img.shields.io/badge/.NET-8.0-purple?style=flat-square" alt=".NET 8.0"/>
+  <img src="https://img.shields.io/badge/License-MPL%202.0-green?style=flat-square" alt="License"/>
+  <img src="https://img.shields.io/badge/MCP-Enabled-orange?style=flat-square" alt="MCP Enabled"/>
+</p>
 
 ---
 
-**Made with ❤️ for the astrophotography community**
+## ✨ Features
+
+### 🎯 Multi-Provider AI Support
+
+Connect to your preferred AI service - **free or paid**:
+
+| Provider | Cost | Best For |
+|----------|------|----------|
+| **GitHub Models** | 🆓 Free | Getting started, general use |
+| **Google Gemini** | 🆓 Free tier | Fast responses, good quality |
+| **Ollama** | 🆓 Free (local) | Privacy, offline use |
+| **Anthropic Claude** | 💰 Paid | **MCP equipment control**, best reasoning |
+| **OpenAI** | 💰 Paid | GPT-4o, proven reliability |
+| **OpenRouter** | 💰 Pay-per-use | Access to many models |
+
+### 🔧 MCP Equipment Control (Anthropic Claude)
+
+With **Model Context Protocol (MCP)** enabled, Claude can **directly control your NINA equipment**:
+
+- 📷 **Camera**: Connect, capture images, set cooling, adjust settings
+- 🔭 **Mount**: Slew to targets, park/unpark, tracking control
+- 🎯 **Focuser**: Move to position, auto-focus integration
+- 🎨 **Filter Wheel**: Change filters programmatically
+- ⭐ **Guider**: Start/stop guiding, calibration
+- 🏠 **Dome**: Open/close shutter, sync with mount
+
+**Example commands:**
+```
+"Check my equipment status"
+"Connect to the camera and set cooling to -10°C"
+"Slew to M31"
+"Take a 30 second exposure with the Ha filter"
+```
+
+### 💬 Interactive AI Chat Panel
+
+- Dockable chat panel within NINA
+- Real-time equipment status queries
+- Astrophotography advice and troubleshooting
+- Session planning assistance
+
+---
+
+## 📦 Installation
+
+### From NINA Plugin Manager (Recommended)
+
+1. Open NINA → **Options** → **Plugins**
+2. Search for "**AI Assistant**"
+3. Click **Install**
+4. Restart NINA
+
+### Manual Installation
+
+1. Download the latest release from [Releases](../../releases)
+2. Extract to `%localappdata%\NINA\Plugins\3.0.0\AI Assistant\`
+3. Restart NINA
+
+---
+
+## ⚙️ Configuration
+
+### Step 1: Choose Your AI Provider
+
+Go to **Options** → **Plugins** → **AI Assistant**
+
+### Step 2: Configure API Key
+
+<details>
+<summary><b>🆓 GitHub Models (Free)</b></summary>
+
+1. Visit [github.com/settings/tokens](https://github.com/settings/tokens)
+2. Generate a new token (classic) with basic permissions
+3. Paste the token in the plugin settings
+4. Select a model (e.g., `gpt-4o-mini`)
+
+</details>
+
+<details>
+<summary><b>🆓 Google Gemini (Free tier)</b></summary>
+
+1. Visit [makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
+2. Create an API key
+3. Paste the key in plugin settings
+4. Select `gemini-1.5-flash` or `gemini-1.5-pro`
+
+</details>
+
+<details>
+<summary><b>🆓 Ollama (Local, Free)</b></summary>
+
+1. Install Ollama from [ollama.ai](https://ollama.ai)
+2. Run `ollama pull llama3.2` (or your preferred model)
+3. Set endpoint to `http://localhost:11434`
+4. Select the model you pulled
+
+</details>
+
+<details>
+<summary><b>💰 Anthropic Claude (MCP Enabled)</b></summary>
+
+1. Visit [console.anthropic.com](https://console.anthropic.com/)
+2. Create an API key
+3. Paste the key in plugin settings
+4. Select model (e.g., `claude-sonnet-4-20250514`)
+5. ✅ Enable **MCP Control** for equipment integration
+
+</details>
+
+<details>
+<summary><b>💰 OpenAI</b></summary>
+
+1. Visit [platform.openai.com/api-keys](https://platform.openai.com/api-keys)
+2. Create an API key
+3. Paste the key in plugin settings
+4. Select model (e.g., `gpt-4o`, `gpt-4o-mini`)
+
+</details>
+
+---
+
+## 🔌 MCP Integration
+
+### Requirements
+
+1. **NINA Advanced API Plugin** - Install from NINA Plugin Manager
+2. **Anthropic Claude** as the AI provider
+3. **MCP Enabled** checkbox checked in settings
+
+### Setup
+
+1. Install the **NINA Advanced API** plugin
+2. Ensure it's running on port `1888` (default)
+3. In AI Assistant settings:
+   - Select **Anthropic Claude (MCP)** as provider
+   - Check **Enable MCP Control**
+   - Verify NINA Host: `localhost` and Port: `1888`
+4. Click **Test MCP Connection**
+
+### Available MCP Tools
+
+| Category | Tools |
+|----------|-------|
+| **Status** | `nina_get_status`, `nina_get_version` |
+| **Camera** | `nina_connect_camera`, `nina_capture_image`, `nina_start_cooling`, `nina_abort_exposure` |
+| **Mount** | `nina_connect_mount`, `nina_slew_mount`, `nina_park_mount`, `nina_set_tracking_mode` |
+| **Focuser** | `nina_connect_focuser`, `nina_move_focuser` |
+| **Filter Wheel** | `nina_connect_filterwheel`, `nina_change_filter` |
+| **Guider** | `nina_start_guiding`, `nina_stop_guiding`, `nina_calibrate_guider` |
+| **Dome** | `nina_connect_dome`, `nina_open_dome_shutter`, `nina_park_dome` |
+
+---
+
+## 🏗️ Building from Source
+
+### Prerequisites
+
+- Visual Studio 2022 or later
+- .NET 8.0 SDK
+- NINA 3.x installed
+
+### Build
+
+```bash
+git clone https://github.com/michelebergo/NINA_AI_plugin.git
+cd NINA_AI_plugin
+dotnet build -c Release
+```
+
+The plugin will be automatically copied to your NINA plugins folder.
+
+---
+
+## 📁 Project Structure
+
+```
+NINA.Plugin.AIAssistant/
+├── AI/
+│   ├── AIService.cs           # Main AI service orchestrator
+│   ├── AIModels.cs            # Request/Response models
+│   ├── MCP/
+│   │   ├── MCPModels.cs       # MCP data structures
+│   │   └── NINAAdvancedAPIClient.cs  # NINA API integration
+│   └── Providers/
+│       ├── AnthropicProvider.cs   # Claude with MCP tools
+│       ├── GitHubModelsProvider.cs
+│       ├── GoogleProvider.cs
+│       ├── OllamaProvider.cs
+│       ├── OpenAIProvider.cs
+│       └── OpenRouterProvider.cs
+├── AIChatVM.cs                # Chat panel view model
+├── AIChatTemplate.xaml        # Chat UI template
+├── Options.xaml               # Settings UI
+└── AIAssistantPlugin.cs       # Plugin entry point
+```
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the **Mozilla Public License 2.0** - see the [LICENSE.txt](LICENSE.txt) file for details.
+
+---
+
+## 🙏 Acknowledgments
+
+- [N.I.N.A.](https://nighttime-imaging.eu/) - The amazing astrophotography software
+- [NINA Advanced API](https://github.com/christian-photo/ninaAPI) - API integration for NINA
+- [Anthropic](https://anthropic.com/) - Claude AI with tool-use capabilities
+- The astrophotography community
+
+---
+
+<p align="center">
+  Made with ❤️ for the astrophotography community
+</p>

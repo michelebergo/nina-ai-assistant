@@ -30,12 +30,12 @@ namespace NINA.Plugin.AIAssistant.AI
                 _config = config;
 
                 // GitHub Models endpoint
-                var endpoint = config.Endpoint ?? "https://models.inference.ai.azure.com";
+                var endpoint = new Uri("https://models.inference.ai.azure.com");
                 
                 // GitHub PAT or API key
                 var credential = new AzureKeyCredential(config.ApiKey ?? throw new ArgumentException("API key is required"));
 
-                _client = new ChatCompletionsClient(new Uri(endpoint), credential);
+                _client = new ChatCompletionsClient(endpoint, credential);
 
                 Logger.Info("GitHub Models provider initialized successfully");
                 return true;
@@ -71,17 +71,17 @@ namespace NINA.Plugin.AIAssistant.AI
                 };
 
                 var response = await _client.CompleteAsync(chatOptions, cancellationToken);
+                var result = response.Value;
+                var firstChoice = result.Content;
 
                 return new AIResponse
                 {
                     Success = true,
-                    Content = response.Value.Choices[0].Message.Content,
-                    ModelUsed = response.Value.Model,
-                    TokensUsed = response.Value.Usage.TotalTokens,
+                    Content = firstChoice,
+                    ModelUsed = result.Model ?? _config.ModelId,
                     Metadata = new System.Collections.Generic.Dictionary<string, object>
                     {
-                        ["provider"] = "GitHub",
-                        ["finish_reason"] = response.Value.Choices[0].FinishReason.ToString()
+                        ["provider"] = "GitHub"
                     }
                 };
             }
