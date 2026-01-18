@@ -222,13 +222,13 @@ This project is licensed under the Mozilla Public License 2.0 (MPL-2.0).
 
 ## 📞 Support
 
-- [GitHub Issues](https://github.com/yourusername/nina-ai-assistant/issues)
+- [GitHub Issues](https://github.com/michelebergo/nina-ai-assistant/issues)
 - [N.I.N.A. Discord](https://discord.gg/nighttime-imaging)
 
 ## 🔗 Links
 
 - [N.I.N.A. Official Website](https://nighttime-imaging.eu/)
-- [Plugin Repository](https://github.com/yourusername/nina-ai-assistant)
+- [Plugin Repository](https://github.com/michelebergo/nina-ai-assistant)
 - [GitHub Models](https://github.com/marketplace/models)
 - [Microsoft Foundry](https://ai.azure.com)
 

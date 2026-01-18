@@ -20,7 +20,7 @@
 
 ### Method 2: Manual Installation
 
-1. Download the latest release from [GitHub Releases](https://github.com/yourusername/nina-ai-assistant/releases)
+1. Download the latest release from [GitHub Releases](https://github.com/michelebergo/nina-ai-assistant/releases)
 2. Extract the zip file
 3. Copy the contents to: `%LOCALAPPDATA%\NINA\Plugins\AI Assistant\`
 4. Restart N.I.N.A.
@@ -29,7 +29,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/nina-ai-assistant.git
+git clone https://github.com/michelebergo/nina-ai-assistant.git
 cd nina-ai-assistant
 
 # Build the project
@@ -189,7 +189,7 @@ If you see a response, **you're all set!** 🎉
 ## Support
 
 - 📚 [Full Documentation](README.md)
-- 🐛 [Report Issues](https://github.com/yourusername/nina-ai-assistant/issues)
+- 🐛 [Report Issues](https://github.com/michelebergo/nina-ai-assistant/issues)
 - 💬 [NINA Discord](https://discord.gg/nighttime-imaging)
 
 ---

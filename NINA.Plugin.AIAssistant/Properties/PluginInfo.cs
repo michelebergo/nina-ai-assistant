@@ -9,12 +9,12 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyMetadata("LicenseURL", "https://www.mozilla.org/en-US/MPL/2.0/")]
 
 // Repository
-[assembly: AssemblyMetadata("Repository", "https://github.com/yourusername/nina-ai-assistant")]
+[assembly: AssemblyMetadata("Repository", "https://github.com/michelebergo/nina-ai-assistant")]
 
 // Optional metadata
-[assembly: AssemblyMetadata("Homepage", "https://github.com/yourusername/nina-ai-assistant")]
+[assembly: AssemblyMetadata("Homepage", "https://github.com/michelebergo/nina-ai-assistant")]
 [assembly: AssemblyMetadata("Tags", "AI,Machine Learning,Image Analysis,Automation,Assistant")]
-[assembly: AssemblyMetadata("ChangelogURL", "https://github.com/yourusername/nina-ai-assistant/blob/main/CHANGELOG.md")]
+[assembly: AssemblyMetadata("ChangelogURL", "https://github.com/michelebergo/nina-ai-assistant/blob/main/CHANGELOG.md")]
 
 // Short description
 [assembly: AssemblyMetadata("ShortDescription", "AI-powered features for automated image analysis, smart sequencing, and intelligent assistance")]
