@@ -1,85 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <defs>
-    <!-- Gradients matching NINA's official colors -->
-    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0d1b2a"/>
-      <stop offset="100%" style="stop-color:#1b263b"/>
+    <!-- NINA official background gradient -->
+    <radialGradient id="ninaBg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#1e3a5f"/>
+      <stop offset="100%" style="stop-color:#0a1929"/>
+    </radialGradient>
+    <!-- NINA N gradient -->
+    <linearGradient id="ninaN" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3d7ab5"/>
+      <stop offset="100%" style="stop-color:#2a5a8a"/>
     </linearGradient>
-    <linearGradient id="ninaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#e63946"/>
-      <stop offset="100%" style="stop-color:#c62828"/>
+    <!-- AI accent gradient -->
+    <linearGradient id="aiAccent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00ffff"/>
+      <stop offset="100%" style="stop-color:#00c8ff"/>
     </linearGradient>
-    <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#00d4ff"/>
-      <stop offset="100%" style="stop-color:#00a8cc"/>
-    </linearGradient>
-    <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffd700"/>
-      <stop offset="100%" style="stop-color:#ffb700"/>
-    </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+    <filter id="aiGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="glow"/>
       <feMerge>
-        <feMergeNode in="coloredBlur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-    <filter id="softGlow">
-      <feGaussianBlur stdDeviation="0.8" result="coloredBlur"/>
-      <feMerge>
-        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="glow"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
   </defs>
   
-  <!-- Background circle (NINA style dark blue) -->
-  <circle cx="64" cy="64" r="62" fill="url(#bgGradient)"/>
+  <!-- NINA official style background circle -->
+  <circle cx="64" cy="64" r="62" fill="url(#ninaBg)"/>
   
-  <!-- Outer ring (NINA red accent) -->
-  <circle cx="64" cy="64" r="58" fill="none" stroke="url(#ninaGradient)" stroke-width="3"/>
+  <!-- Outer ring (NINA style) -->
+  <circle cx="64" cy="64" r="58" fill="none" stroke="#2a4a6a" stroke-width="2"/>
   
-  <!-- Inner decorative ring -->
-  <circle cx="64" cy="64" r="52" fill="none" stroke="#2d4a6a" stroke-width="1" opacity="0.5"/>
-  
-  <!-- NINA-style "N" letterform (simplified, centered) -->
-  <g filter="url(#glow)">
-    <path d="M40 90 L40 38 L50 38 L72 70 L72 38 L82 38 L82 90 L72 90 L50 58 L50 90 Z" 
-          fill="url(#ninaGradient)"/>
+  <!-- NINA stylized "N" - recreating the official shape -->
+  <g fill="url(#ninaN)">
+    <!-- Left vertical bar -->
+    <path d="M38 95 L38 33 L52 33 L52 95 Z"/>
+    <!-- Diagonal -->
+    <path d="M38 33 L52 33 L90 95 L76 95 Z"/>
+    <!-- Right vertical bar -->
+    <path d="M76 33 L90 33 L90 95 L76 95 Z"/>
   </g>
   
-  <!-- AI Circuit overlay (on top of N) -->
-  <g fill="url(#aiGradient)" filter="url(#softGlow)" opacity="0.95">
-    <!-- AI nodes positioned around/on the N -->
-    <circle cx="45" cy="44" r="4"/>
-    <circle cx="77" cy="44" r="4"/>
-    <circle cx="61" cy="64" r="5"/>
-    <circle cx="45" cy="84" r="4"/>
-    <circle cx="77" cy="84" r="4"/>
+  <!-- AI Neural Network Overlay -->
+  <g filter="url(#aiGlow)">
+    <!-- Central brain/AI hub -->
+    <circle cx="64" cy="58" r="8" fill="none" stroke="url(#aiAccent)" stroke-width="2"/>
     
-    <!-- Connecting neural lines -->
-    <line x1="45" y1="44" x2="61" y2="64" stroke="url(#aiGradient)" stroke-width="2"/>
-    <line x1="77" y1="44" x2="61" y2="64" stroke="url(#aiGradient)" stroke-width="2"/>
-    <line x1="61" y1="64" x2="45" y2="84" stroke="url(#aiGradient)" stroke-width="2"/>
-    <line x1="61" y1="64" x2="77" y2="84" stroke="url(#aiGradient)" stroke-width="2"/>
-    <line x1="45" y1="44" x2="77" y2="44" stroke="url(#aiGradient)" stroke-width="1.5" opacity="0.6"/>
-    <line x1="45" y1="84" x2="77" y2="84" stroke="url(#aiGradient)" stroke-width="1.5" opacity="0.6"/>
+    <!-- Neural connection nodes -->
+    <circle cx="42" cy="42" r="4" fill="url(#aiAccent)"/>
+    <circle cx="86" cy="42" r="4" fill="url(#aiAccent)"/>
+    <circle cx="42" cy="78" r="4" fill="url(#aiAccent)"/>
+    <circle cx="86" cy="78" r="4" fill="url(#aiAccent)"/>
+    <circle cx="64" cy="28" r="3" fill="url(#aiAccent)"/>
+    <circle cx="64" cy="88" r="3" fill="url(#aiAccent)"/>
+    
+    <!-- Neural connections -->
+    <line x1="64" y1="58" x2="42" y2="42" stroke="url(#aiAccent)" stroke-width="1.5" opacity="0.8"/>
+    <line x1="64" y1="58" x2="86" y2="42" stroke="url(#aiAccent)" stroke-width="1.5" opacity="0.8"/>
+    <line x1="64" y1="58" x2="42" y2="78" stroke="url(#aiAccent)" stroke-width="1.5" opacity="0.8"/>
+    <line x1="64" y1="58" x2="86" y2="78" stroke="url(#aiAccent)" stroke-width="1.5" opacity="0.8"/>
+    <line x1="64" y1="58" x2="64" y2="28" stroke="url(#aiAccent)" stroke-width="1.5" opacity="0.8"/>
+    <line x1="64" y1="58" x2="64" y2="88" stroke="url(#aiAccent)" stroke-width="1.5" opacity="0.8"/>
+    
+    <!-- Secondary connections -->
+    <line x1="42" y1="42" x2="64" y2="28" stroke="url(#aiAccent)" stroke-width="1" opacity="0.5"/>
+    <line x1="86" y1="42" x2="64" y2="28" stroke="url(#aiAccent)" stroke-width="1" opacity="0.5"/>
+    <line x1="42" y1="78" x2="64" y2="88" stroke="url(#aiAccent)" stroke-width="1" opacity="0.5"/>
+    <line x1="86" y1="78" x2="64" y2="88" stroke="url(#aiAccent)" stroke-width="1" opacity="0.5"/>
   </g>
   
-  <!-- Small stars (astronomy theme) -->
-  <g fill="url(#starGradient)" filter="url(#softGlow)">
-    <polygon points="20,25 21.5,29 26,29 22.5,31.5 24,36 20,33 16,36 17.5,31.5 14,29 18.5,29" transform="scale(0.6) translate(10,10)"/>
-    <polygon points="108,20 109.5,24 114,24 110.5,26.5 112,31 108,28 104,31 105.5,26.5 102,24 106.5,24" transform="scale(0.5) translate(100,5)"/>
-    <polygon points="100,100 101.5,104 106,104 102.5,106.5 104,111 100,108 96,111 97.5,106.5 94,104 98.5,104" transform="scale(0.45) translate(110,110)"/>
-  </g>
-  
-  <!-- Subtle star dots -->
-  <g fill="#ffffff" opacity="0.6">
-    <circle cx="22" cy="50" r="1"/>
-    <circle cx="106" cy="55" r="1.2"/>
-    <circle cx="30" cy="100" r="0.8"/>
-    <circle cx="98" cy="95" r="1"/>
-    <circle cx="64" cy="18" r="1.5"/>
+  <!-- Small "AI" text badge in corner -->
+  <g>
+    <circle cx="100" cy="100" r="14" fill="#0a1929" stroke="url(#aiAccent)" stroke-width="1.5"/>
+    <text x="100" y="104" font-family="Arial, sans-serif" font-size="10" font-weight="bold" 
+          fill="url(#aiAccent)" text-anchor="middle">AI</text>
   </g>
 </svg>
