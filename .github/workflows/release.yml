@@ -1,0 +1,65 @@
+name: Create Release and Manifest
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags like v1.0.0.1
+
+permissions:
+  contents: write  # Allows creating releases and uploading assets
+
+jobs:
+  release:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      
+      - name: Restore dependencies
+        run: dotnet restore
+        
+      - name: Build Release
+        run: dotnet build -c Release --no-restore
+      
+      - name: Get version from tag
+        id: get_version
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+          echo "Building version: $version"
+        shell: pwsh
+      
+      - name: Calculate DLL Checksum
+        id: checksum
+        run: |
+          $dllPath = "NINA.Plugin.AIAssistant\bin\Release\net8.0-windows\NINA.Plugin.AIAssistant.dll"
+          $hash = (Get-FileHash -Path $dllPath -Algorithm SHA256).Hash
+          echo "SHA256=$hash" >> $env:GITHUB_OUTPUT
+          echo "Checksum: $hash"
+        shell: pwsh
+      
+      - name: Update manifest with checksum
+        run: |
+          $manifestPath = "NINA.Plugin.AIAssistant\manifest.json"
+          $manifest = Get-Content $manifestPath | ConvertFrom-Json
+          $manifest.Installer.Checksum = "${{ steps.checksum.outputs.SHA256 }}"
+          $manifest | ConvertTo-Json -Depth 10 | Set-Content $manifestPath -Encoding UTF8
+        shell: pwsh
+      
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            NINA.Plugin.AIAssistant/bin/Release/net8.0-windows/NINA.Plugin.AIAssistant.dll
+            NINA.Plugin.AIAssistant/manifest.json
+          body_path: RELEASE_NOTES.md
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
