@@ -1,19 +1,32 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
   <defs>
+    <!-- Gradients matching NINA's official colors -->
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#0f0f1a;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#0d1b2a"/>
+      <stop offset="100%" style="stop-color:#1b263b"/>
     </linearGradient>
-    <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#ff8c00;stop-opacity:1" />
+    <linearGradient id="ninaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e63946"/>
+      <stop offset="100%" style="stop-color:#c62828"/>
     </linearGradient>
     <linearGradient id="aiGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#0099cc;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#00d4ff"/>
+      <stop offset="100%" style="stop-color:#00a8cc"/>
     </linearGradient>
-    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+    <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffd700"/>
+      <stop offset="100%" style="stop-color:#ffb700"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="softGlow">
+      <feGaussianBlur stdDeviation="0.8" result="coloredBlur"/>
       <feMerge>
         <feMergeNode in="coloredBlur"/>
         <feMergeNode in="SourceGraphic"/>
@@ -21,57 +34,52 @@
     </filter>
   </defs>
   
-  <!-- Background circle -->
-  <circle cx="256" cy="256" r="250" fill="url(#bgGradient)" stroke="#333" stroke-width="4"/>
+  <!-- Background circle (NINA style dark blue) -->
+  <circle cx="64" cy="64" r="62" fill="url(#bgGradient)"/>
   
-  <!-- Stars in background -->
+  <!-- Outer ring (NINA red accent) -->
+  <circle cx="64" cy="64" r="58" fill="none" stroke="url(#ninaGradient)" stroke-width="3"/>
+  
+  <!-- Inner decorative ring -->
+  <circle cx="64" cy="64" r="52" fill="none" stroke="#2d4a6a" stroke-width="1" opacity="0.5"/>
+  
+  <!-- NINA-style "N" letterform (simplified, centered) -->
+  <g filter="url(#glow)">
+    <path d="M40 90 L40 38 L50 38 L72 70 L72 38 L82 38 L82 90 L72 90 L50 58 L50 90 Z" 
+          fill="url(#ninaGradient)"/>
+  </g>
+  
+  <!-- AI Circuit overlay (on top of N) -->
+  <g fill="url(#aiGradient)" filter="url(#softGlow)" opacity="0.95">
+    <!-- AI nodes positioned around/on the N -->
+    <circle cx="45" cy="44" r="4"/>
+    <circle cx="77" cy="44" r="4"/>
+    <circle cx="61" cy="64" r="5"/>
+    <circle cx="45" cy="84" r="4"/>
+    <circle cx="77" cy="84" r="4"/>
+    
+    <!-- Connecting neural lines -->
+    <line x1="45" y1="44" x2="61" y2="64" stroke="url(#aiGradient)" stroke-width="2"/>
+    <line x1="77" y1="44" x2="61" y2="64" stroke="url(#aiGradient)" stroke-width="2"/>
+    <line x1="61" y1="64" x2="45" y2="84" stroke="url(#aiGradient)" stroke-width="2"/>
+    <line x1="61" y1="64" x2="77" y2="84" stroke="url(#aiGradient)" stroke-width="2"/>
+    <line x1="45" y1="44" x2="77" y2="44" stroke="url(#aiGradient)" stroke-width="1.5" opacity="0.6"/>
+    <line x1="45" y1="84" x2="77" y2="84" stroke="url(#aiGradient)" stroke-width="1.5" opacity="0.6"/>
+  </g>
+  
+  <!-- Small stars (astronomy theme) -->
+  <g fill="url(#starGradient)" filter="url(#softGlow)">
+    <polygon points="20,25 21.5,29 26,29 22.5,31.5 24,36 20,33 16,36 17.5,31.5 14,29 18.5,29" transform="scale(0.6) translate(10,10)"/>
+    <polygon points="108,20 109.5,24 114,24 110.5,26.5 112,31 108,28 104,31 105.5,26.5 102,24 106.5,24" transform="scale(0.5) translate(100,5)"/>
+    <polygon points="100,100 101.5,104 106,104 102.5,106.5 104,111 100,108 96,111 97.5,106.5 94,104 98.5,104" transform="scale(0.45) translate(110,110)"/>
+  </g>
+  
+  <!-- Subtle star dots -->
   <g fill="#ffffff" opacity="0.6">
-    <circle cx="100" cy="120" r="2"/>
-    <circle cx="400" cy="100" r="1.5"/>
-    <circle cx="80" cy="300" r="1"/>
-    <circle cx="420" cy="280" r="2"/>
-    <circle cx="150" cy="400" r="1.5"/>
-    <circle cx="380" cy="380" r="1"/>
-    <circle cx="200" cy="80" r="1"/>
-    <circle cx="320" cy="420" r="1.5"/>
+    <circle cx="22" cy="50" r="1"/>
+    <circle cx="106" cy="55" r="1.2"/>
+    <circle cx="30" cy="100" r="0.8"/>
+    <circle cx="98" cy="95" r="1"/>
+    <circle cx="64" cy="18" r="1.5"/>
   </g>
-  
-  <!-- Main star (representing astronomy) -->
-  <g filter="url(#glow)">
-    <path d="M256 100 L275 180 L360 180 L295 230 L315 310 L256 265 L197 310 L217 230 L152 180 L237 180 Z" 
-          fill="url(#starGradient)" opacity="0.9"/>
-  </g>
-  
-  <!-- AI Brain/Circuit design -->
-  <g filter="url(#glow)">
-    <!-- Central brain circle -->
-    <circle cx="256" cy="280" r="80" fill="none" stroke="url(#aiGradient)" stroke-width="6"/>
-    
-    <!-- Neural connections -->
-    <path d="M200 280 Q 230 250 256 250 Q 282 250 312 280" fill="none" stroke="url(#aiGradient)" stroke-width="4"/>
-    <path d="M200 280 Q 230 310 256 310 Q 282 310 312 280" fill="none" stroke="url(#aiGradient)" stroke-width="4"/>
-    
-    <!-- Connection nodes -->
-    <circle cx="200" cy="280" r="10" fill="url(#aiGradient)"/>
-    <circle cx="312" cy="280" r="10" fill="url(#aiGradient)"/>
-    <circle cx="256" cy="250" r="8" fill="url(#aiGradient)"/>
-    <circle cx="256" cy="310" r="8" fill="url(#aiGradient)"/>
-    <circle cx="256" cy="280" r="12" fill="url(#aiGradient)"/>
-    
-    <!-- Outer connection lines -->
-    <line x1="176" y1="280" x2="140" y2="280" stroke="url(#aiGradient)" stroke-width="3"/>
-    <line x1="336" y1="280" x2="372" y2="280" stroke="url(#aiGradient)" stroke-width="3"/>
-    <line x1="256" y1="200" x2="256" y2="165" stroke="url(#aiGradient)" stroke-width="3"/>
-    <line x1="256" y1="360" x2="256" y2="395" stroke="url(#aiGradient)" stroke-width="3"/>
-    
-    <!-- Outer nodes -->
-    <circle cx="140" cy="280" r="6" fill="url(#aiGradient)"/>
-    <circle cx="372" cy="280" r="6" fill="url(#aiGradient)"/>
-    <circle cx="256" cy="165" r="6" fill="url(#aiGradient)"/>
-    <circle cx="256" cy="395" r="6" fill="url(#aiGradient)"/>
-  </g>
-  
-  <!-- "AI" text -->
-  <text x="256" y="295" font-family="Arial, sans-serif" font-size="36" font-weight="bold" 
-        fill="#ffffff" text-anchor="middle" opacity="0.9">AI</text>
 </svg>
