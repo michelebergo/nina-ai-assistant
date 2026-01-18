@@ -1,0 +1,168 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:NINA.Plugin.AIAssistant"
+    xmlns:ai="clr-namespace:NINA.Plugin.AIAssistant.AI"
+    xmlns:wpfbase="clr-namespace:NINA.WPF.Base;assembly=NINA.WPF.Base">
+
+    <DataTemplate x:Key="AI Assistant_Options">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel DataContext="{Binding}" Orientation="Vertical" Margin="10">
+                
+                <!-- Header -->
+                <TextBlock Text="AI Assistant Configuration" FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+                <TextBlock Text="Configure one or more AI providers to enable intelligent features in NINA." 
+                           TextWrapping="Wrap" Margin="0,0,0,20" Opacity="0.7"/>
+
+                <!-- Active Provider Selection -->
+                <GroupBox Header="Active Provider" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="Select which AI provider to use:" Margin="0,5,0,10"/>
+                        <ComboBox SelectedIndex="{Binding ActiveProviderType}" Margin="0,0,0,10">
+                            <ComboBoxItem Content="GitHub Models (Free)" Tag="0"/>
+                            <ComboBoxItem Content="Microsoft Foundry" Tag="1"/>
+                            <ComboBoxItem Content="Azure OpenAI" Tag="2"/>
+                            <ComboBoxItem Content="OpenAI" Tag="3"/>
+                            <ComboBoxItem Content="Anthropic Claude" Tag="4"/>
+                            <ComboBoxItem Content="Google AI (Gemini)" Tag="5"/>
+                        </ComboBox>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- GitHub Models Settings -->
+                <GroupBox Header="GitHub Models (Free Tier Available)" Margin="0,0,0,20">
+                    <StackPanel>
+                        <CheckBox Content="Enable GitHub Models" IsChecked="{Binding GitHubEnabled}" Margin="0,5"/>
+                        
+                        <TextBlock Text="GitHub Personal Access Token (PAT):" Margin="0,10,0,5"/>
+                        <TextBlock Text="Get your free token at: https://github.com/settings/tokens" 
+                                   Opacity="0.6" FontSize="10" Margin="0,0,0,5"/>
+                        <PasswordBox x:Name="GitHubApiKeyBox" Margin="0,0,0,10"/>
+                        
+                        <TextBlock Text="Model ID:" Margin="0,5"/>
+                        <ComboBox Text="{Binding GitHubModelId}" IsEditable="True" Margin="0,5,0,5">
+                            <ComboBoxItem Content="gpt-4o-mini"/>
+                            <ComboBoxItem Content="gpt-4o"/>
+                            <ComboBoxItem Content="gpt-4.1"/>
+                            <ComboBoxItem Content="o1-mini"/>
+                            <ComboBoxItem Content="claude-sonnet-4-5"/>
+                            <ComboBoxItem Content="llama-3.3-70b-instruct"/>
+                            <ComboBoxItem Content="phi-4"/>
+                        </ComboBox>
+                        
+                        <TextBlock Text="💡 GitHub Models are perfect for getting started - free tier available!" 
+                                   Foreground="Green" FontSize="11" Margin="0,5" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Microsoft Foundry Settings -->
+                <GroupBox Header="Microsoft Foundry (Enterprise)" Margin="0,0,0,20">
+                    <StackPanel>
+                        <CheckBox Content="Enable Microsoft Foundry" IsChecked="{Binding FoundryEnabled}" Margin="0,5"/>
+                        
+                        <TextBlock Text="API Key:" Margin="0,10,0,5"/>
+                        <PasswordBox x:Name="FoundryApiKeyBox" Margin="0,0,0,10"/>
+                        
+                        <TextBlock Text="Endpoint URL:" Margin="0,5"/>
+                        <TextBox Text="{Binding FoundryEndpoint}" Margin="0,5,0,10"/>
+                        
+                        <TextBlock Text="Deployment/Model Name:" Margin="0,5"/>
+                        <TextBox Text="{Binding FoundryDeploymentName}" Margin="0,5,0,5"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Azure OpenAI Settings -->
+                <GroupBox Header="Azure OpenAI Service" Margin="0,0,0,20">
+                    <StackPanel>
+                        <CheckBox Content="Enable Azure OpenAI" IsChecked="{Binding AzureOpenAIEnabled}" Margin="0,5"/>
+                        
+                        <TextBlock Text="API Key:" Margin="0,10,0,5"/>
+                        <PasswordBox x:Name="AzureOpenAIApiKeyBox" Margin="0,0,0,10"/>
+                        
+                        <TextBlock Text="Endpoint URL:" Margin="0,5"/>
+                        <TextBox Text="{Binding AzureOpenAIEndpoint}" 
+                                 ToolTip="e.g., https://your-resource.openai.azure.com/" 
+                                 Margin="0,5,0,10"/>
+                        
+                        <TextBlock Text="Deployment Name:" Margin="0,5"/>
+                        <TextBox Text="{Binding AzureOpenAIDeploymentName}" Margin="0,5,0,5"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- OpenAI Settings -->
+                <GroupBox Header="OpenAI (Direct API)" Margin="0,0,0,20">
+                    <StackPanel>
+                        <CheckBox Content="Enable OpenAI" IsChecked="{Binding OpenAIEnabled}" Margin="0,5"/>
+                        
+                        <TextBlock Text="API Key:" Margin="0,10,0,5"/>
+                        <TextBlock Text="Get your API key at: https://platform.openai.com/api-keys" 
+                                   Opacity="0.6" FontSize="10" Margin="0,0,0,5"/>
+                        <PasswordBox x:Name="OpenAIApiKeyBox" Margin="0,0,0,10"/>
+                        
+                        <TextBlock Text="Model ID:" Margin="0,5"/>
+                        <ComboBox Text="{Binding OpenAIModelId}" IsEditable="True" Margin="0,5,0,5">
+                            <ComboBoxItem Content="gpt-4o-mini"/>
+                            <ComboBoxItem Content="gpt-4o"/>
+                            <ComboBoxItem Content="gpt-4-turbo"/>
+                            <ComboBoxItem Content="o1-mini"/>
+                            <ComboBoxItem Content="o1-preview"/>
+                        </ComboBox>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Anthropic Settings -->
+                <GroupBox Header="Anthropic Claude" Margin="0,0,0,20">
+                    <StackPanel>
+                        <CheckBox Content="Enable Anthropic" IsChecked="{Binding AnthropicEnabled}" Margin="0,5"/>
+                        
+                        <TextBlock Text="API Key:" Margin="0,10,0,5"/>
+                        <TextBlock Text="Get your API key at: https://console.anthropic.com/" 
+                                   Opacity="0.6" FontSize="10" Margin="0,0,0,5"/>
+                        <PasswordBox x:Name="AnthropicApiKeyBox" Margin="0,0,0,10"/>
+                        
+                        <TextBlock Text="Model ID:" Margin="0,5"/>
+                        <ComboBox Text="{Binding AnthropicModelId}" IsEditable="True" Margin="0,5,0,5">
+                            <ComboBoxItem Content="claude-sonnet-4-5"/>
+                            <ComboBoxItem Content="claude-opus-4-5"/>
+                            <ComboBoxItem Content="claude-haiku-4-5"/>
+                            <ComboBoxItem Content="claude-3-opus"/>
+                        </ComboBox>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Google AI Settings -->
+                <GroupBox Header="Google AI (Gemini)" Margin="0,0,0,20">
+                    <StackPanel>
+                        <CheckBox Content="Enable Google AI" IsChecked="{Binding GoogleAIEnabled}" Margin="0,5"/>
+                        
+                        <TextBlock Text="API Key:" Margin="0,10,0,5"/>
+                        <TextBlock Text="Get your API key at: https://makersuite.google.com/app/apikey" 
+                                   Opacity="0.6" FontSize="10" Margin="0,0,0,5"/>
+                        <PasswordBox x:Name="GoogleAIApiKeyBox" Margin="0,0,0,10"/>
+                        
+                        <TextBlock Text="Model ID:" Margin="0,5"/>
+                        <ComboBox Text="{Binding GoogleAIModelId}" IsEditable="True" Margin="0,5,0,5">
+                            <ComboBoxItem Content="gemini-2.0-flash"/>
+                            <ComboBoxItem Content="gemini-1.5-pro"/>
+                            <ComboBoxItem Content="gemini-1.5-flash"/>
+                            <ComboBoxItem Content="gemini-pro"/>
+                        </ComboBox>
+                        
+                        <TextBlock Text="💡 Gemini 1.5 Flash has a generous free tier!" 
+                                   Foreground="Green" FontSize="11" Margin="0,5" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- Help Text -->
+                <TextBlock TextWrapping="Wrap" Margin="0,20,0,0" Opacity="0.7">
+                    <Run Text="Need help? "/><Hyperlink NavigateUri="https://github.com/yourusername/nina-ai-assistant" 
+                                                        RequestNavigate="Hyperlink_RequestNavigate">
+                        <Run Text="Visit the documentation"/>
+                    </Hyperlink>
+                </TextBlock>
+
+            </StackPanel>
+        </ScrollViewer>
+    </DataTemplate>
+
+</ResourceDictionary>
