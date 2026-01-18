@@ -76,6 +76,6 @@ To enable AI-controlled equipment:
 ## Uninstallation
 
 1. Go to **Options** → **Plugins**
-2. Find **AI Assistant**
+2. Find **ai assistant**
 3. Click **Uninstall**
 4. Restart NINA

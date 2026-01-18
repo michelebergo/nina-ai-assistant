@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="assets/icon.svg" alt="NINA AI Assistant" width="200"/>
+  <img src="assets/icon.svg" alt="NINA ai assistant" width="200"/>
 </p>
 
-<h1 align="center">NINA AI Assistant</h1>
+<h1 align="center">NINA ai assistant</h1>
 
 <p align="center">
   <strong>🤖 AI-powered astrophotography assistant for N.I.N.A. with MCP equipment control</strong>
@@ -90,7 +90,7 @@ With **Model Context Protocol (MCP)** enabled, Claude can **directly control you
 
 ### Step 1: Choose Your AI Provider
 
-Go to **Options** → **Plugins** → **AI Assistant**
+Go to **Options** → **Plugins** → **ai assistant**
 
 ### Step 2: Configure API Key
 

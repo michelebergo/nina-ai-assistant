@@ -21,7 +21,7 @@ namespace NINA.Plugin.AIAssistant
     [Export(typeof(IDockableVM))]
     public class AIChatVM : ObservableObject, IDockableVM
     {
-        private string _title = "AI Assistant";
+        private string _title = "ai assistant";
         public string Title
         {
             get => _title;

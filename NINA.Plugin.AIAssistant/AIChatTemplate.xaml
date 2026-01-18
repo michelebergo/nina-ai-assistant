@@ -27,7 +27,7 @@
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
-                        <TextBlock Text="AI Assistant" 
+                        <TextBlock Text="ai assistant" 
                                    FontSize="14" 
                                    FontWeight="SemiBold"
                                    Foreground="{StaticResource PrimaryBrush}"/>

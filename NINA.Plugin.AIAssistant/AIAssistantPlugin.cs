@@ -40,7 +40,7 @@ namespace NINA.Plugin.AIAssistant
             // Initialize selected provider
             _ = InitializeAIProviderAsync();
 
-            Logger.Info("NINA AI Assistant Plugin loaded successfully");
+            Logger.Info("NINA ai assistant Plugin loaded successfully");
         }
 
         private async Task InitializeAIProviderAsync()

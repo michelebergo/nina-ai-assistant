@@ -1,6 +1,6 @@
 {
   "Identifier": "af5e2826-e3b4-4b9c-9a1a-1e8d7c8b6a9e",
-  "Name": "AI Assistant",
+  "Name": "ai assistant",
   "Author": "Michele Bergo",
   "Version": {
     "Major": 1,
@@ -16,10 +16,8 @@
   },
   "ShortDescription": "AI-powered assistant for astrophotography using GitHub Models",
   "LongDescription": "Integrates AI capabilities into NINA using GitHub Models. Provides AI-powered image analysis, exposure suggestions, and general astrophotography assistance through sequence instructions.",
-  "FeaturedImageURL": "",
-  "ScreenshotURL": "",
-  "AltScreenshotURL": "",
   "ChangelogURL": "https://github.com/michelebergo/nina-ai-assistant/blob/main/CHANGELOG.md",
+  "IconURL": "icon.png",
   "Repository": "https://github.com/michelebergo/nina-ai-assistant",
   "License": "MPL-2.0",
   "LicenseURL": "https://www.mozilla.org/en-US/MPL/2.0/",

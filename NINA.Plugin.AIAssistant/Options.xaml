@@ -4,11 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:NINA.Plugin.AIAssistant">
 
-    <DataTemplate x:Key="NINA AI Assistant_Options">
+    <DataTemplate x:Key="NINA ai assistant_Options">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Orientation="Vertical" Margin="10">
                 
-                <TextBlock Text="AI Assistant Configuration" FontSize="18" FontWeight="Bold" Margin="0,0,0,5"/>
+                <TextBlock Text="ai assistant Configuration" FontSize="18" FontWeight="Bold" Margin="0,0,0,5"/>
                 <TextBlock TextWrapping="Wrap" Margin="0,0,0,15" FontSize="12" Opacity="0.7">Configure your AI provider. Choose from free options (GitHub Models, Google Gemini, Ollama) or paid services (OpenAI, Anthropic, OpenRouter).</TextBlock>
 
                 <GroupBox Header="Active Provider" Margin="0,0,0,10">

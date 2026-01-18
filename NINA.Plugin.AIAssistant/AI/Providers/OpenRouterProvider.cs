@@ -35,7 +35,7 @@ namespace NINA.Plugin.AIAssistant.AI
                     new AuthenticationHeaderValue("Bearer", config.ApiKey ?? throw new ArgumentException("API key is required"));
                 _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 _httpClient.DefaultRequestHeaders.Add("HTTP-Referer", "https://github.com/nina-ai-assistant");
-                _httpClient.DefaultRequestHeaders.Add("X-Title", "NINA AI Assistant");
+                _httpClient.DefaultRequestHeaders.Add("X-Title", "NINA ai assistant");
 
                 Logger.Info("OpenRouter provider initialized successfully");
                 return true;

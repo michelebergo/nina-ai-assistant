@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 // General Information
-[assembly: AssemblyTitle("NINA AI Assistant")]
+[assembly: AssemblyTitle("NINA ai assistant")]
 [assembly: AssemblyDescription("AI-powered assistant for N.I.N.A. imaging suite")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("NINA Community")]

@@ -1,6 +1,6 @@
-# Contributing to NINA AI Assistant
+# Contributing to NINA ai assistant
 
-Thank you for your interest in contributing to the NINA AI Assistant plugin! 🎉
+Thank you for your interest in contributing to the NINA ai assistant plugin! 🎉
 
 ## How to Contribute
 
