@@ -67,7 +67,8 @@ namespace NINA.Plugin.AIAssistant.AI
                     Messages = { messages[0], messages[1] },
                     Temperature = (float)request.Temperature,
                     MaxTokens = request.MaxTokens,
-                    Model = _config.ModelId ?? "gpt-4o-mini" // Default to gpt-4o-mini for cost efficiency
+                    // Latest models: gpt-4o (most capable), gpt-4o-mini (fast/efficient), o1-preview/o1-mini (reasoning)
+                    Model = _config.ModelId ?? "gpt-4o" 
                 };
 
                 var response = await _client.CompleteAsync(chatOptions, cancellationToken);

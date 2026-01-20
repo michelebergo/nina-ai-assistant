@@ -52,7 +52,8 @@ namespace NINA.Plugin.AIAssistant.AI
 
             try
             {
-                var modelId = _config.ModelId ?? "gemini-1.5-flash";
+                // Latest: gemini-2.0-flash-exp (fastest, multimodal), gemini-1.5-pro (most capable)
+                var modelId = _config.ModelId ?? "gemini-2.0-flash-exp";
                 var systemInstruction = request.SystemPrompt ?? "You are an expert astrophotography assistant for N.I.N.A. (Nighttime Imaging 'N' Astronomy). Help analyze images, suggest optimal settings, and provide intelligent guidance.";
 
                 var requestBody = new

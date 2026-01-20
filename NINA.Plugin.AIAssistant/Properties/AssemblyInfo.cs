@@ -14,12 +14,12 @@ using System.Runtime.InteropServices;
 // COM visibility
 [assembly: ComVisible(false)]
 
-// Plugin GUID - Do NOT change this after first release
-[assembly: Guid("8F3A5B7C-9D2E-4F6A-B1C3-7E8D9A0B1C2D")]
+// Plugin GUID - Must match manifest.json Identifier
+[assembly: Guid("af5e2826-e3b4-4b9c-9a1a-1e8d7c8b6a9e")]
 
 // Version information
-[assembly: AssemblyVersion("1.0.0.3")]
-[assembly: AssemblyFileVersion("1.0.0.3")]
+[assembly: AssemblyVersion("1.0.0.4")]
+[assembly: AssemblyFileVersion("1.0.0.4")]
 
 // Plugin metadata
 [assembly: AssemblyMetadata("MinimumApplicationVersion", "3.0.0.0")]

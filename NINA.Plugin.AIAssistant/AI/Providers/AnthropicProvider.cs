@@ -122,6 +122,7 @@ namespace NINA.Plugin.AIAssistant.AI
 
             var requestBody = new
             {
+                // Latest: claude-sonnet-4-20250514 (Claude 4, May 2025), claude-3-7-sonnet-20250219, claude-3-5-sonnet-20241022
                 model = _config!.ModelId ?? "claude-sonnet-4-20250514",
                 max_tokens = request.MaxTokens,
                 system = request.SystemPrompt ?? GetDefaultSystemPrompt(),
@@ -181,6 +182,7 @@ namespace NINA.Plugin.AIAssistant.AI
                 
                 var requestBody = new
                 {
+                    // Latest: claude-sonnet-4-20250514 (Claude 4) with extended tool use capability
                     model = _config!.ModelId ?? "claude-sonnet-4-20250514",
                     max_tokens = request.MaxTokens,
                     system = systemPrompt,
@@ -252,8 +254,21 @@ namespace NINA.Plugin.AIAssistant.AI
                     var toolName = toolUse["name"]?.ToString() ?? "";
                     var toolInput = toolUse["input"]?.ToObject<Dictionary<string, object>>();
 
-                    Logger.Info($"Executing MCP tool: {toolName}");
+                    Logger.Info($"[MCP] Executing tool: {toolName}");
+                    Logger.Debug($"[MCP] Tool ID: {toolId}");
+                    Logger.Debug($"[MCP] Tool arguments: {JsonConvert.SerializeObject(toolInput)}");
+                    
                     var result = await _mcpClient.InvokeToolAsync(toolName, toolInput, cancellationToken);
+                    
+                    Logger.Info($"[MCP] Tool {toolName} completed - Success: {result.Success}");
+                    if (result.Success)
+                    {
+                        Logger.Debug($"[MCP] Tool result: {result.Content?.Substring(0, Math.Min(200, result.Content?.Length ?? 0))}");
+                    }
+                    else
+                    {
+                        Logger.Error($"[MCP] Tool error: {result.Error}");
+                    }
                     
                     var resultContent = result.Success 
                         ? result.Content ?? "Tool executed successfully" 

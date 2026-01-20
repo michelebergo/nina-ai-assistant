@@ -65,7 +65,8 @@ namespace NINA.Plugin.AIAssistant.AI
 
                 var requestBody = new
                 {
-                    model = _config.ModelId ?? "gpt-4o-mini",
+                    // Latest models: gpt-4o (flagship), o1/o1-preview (reasoning), gpt-4o-mini (efficient)
+                    model = _config.ModelId ?? "gpt-4o",
                     messages = messages,
                     temperature = request.Temperature,
                     max_tokens = request.MaxTokens
