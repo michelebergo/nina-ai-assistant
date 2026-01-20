@@ -1,17 +1,12 @@
 {
   "Identifier": "af5e2826-e3b4-4b9c-9a1a-1e8d7c8b6a9e",
-  "Name": "ai assistant",
+  "Name": "AI Assistant",
   "Author": "Michele Bergo",
-  "Homepage": "https://github.com/michelebergo/nina-ai-assistant",
-  "Repository": "https://github.com/michelebergo/nina-ai-assistant",
-  "License": "MPL-2.0",
-  "LicenseURL": "https://www.mozilla.org/en-US/MPL/2.0/",
-  "ChangelogURL": "https://github.com/michelebergo/nina-ai-assistant/blob/main/CHANGELOG.md",
   "Version": {
     "Major": 1,
     "Minor": 0,
     "Patch": 0,
-    "Build": 1
+    "Build": 3
   },
   "MinimumApplicationVersion": {
     "Major": 3,
@@ -19,22 +14,18 @@
     "Patch": 0,
     "Build": 0
   },
+  "ShortDescription": "AI-powered assistant for astrophotography using GitHub Models",
+  "LongDescription": "Integrates AI capabilities into NINA using GitHub Models. Provides AI-powered image analysis, exposure suggestions, and general astrophotography assistance through sequence instructions.",
+  "ChangelogURL": "https://github.com/michelebergo/nina-ai-assistant/blob/main/CHANGELOG.md",
+  "IconURL": "icon.png",
+  "Repository": "https://github.com/michelebergo/nina-ai-assistant",
+  "License": "MPL-2.0",
+  "LicenseURL": "https://www.mozilla.org/en-US/MPL/2.0/",
   "Tags": [
     "AI",
     "Assistant",
-    "MCP",
-    "Equipment Control",
-    "Anthropic"
-  ],
-  "Descriptions": {
-    "ShortDescription": "Multi-provider AI assistant with MCP equipment control for NINA",
-    "LongDescription": "AI Assistant plugin for NINA supporting 6 AI providers: GitHub Models (free), OpenAI, Anthropic Claude, Google Gemini, Ollama (local), and OpenRouter. Features direct equipment control via Anthropic Claude's tool-use API connected to NINA Advanced API (MCP). Control cameras, mounts, focusers, filter wheels, guiders, and more through natural language.",
-    "FeaturedImageURL": "https://raw.githubusercontent.com/michelebergo/nina-ai-assistant/main/icon.png"
-  },
-  "Installer": {
-    "URL": "https://github.com/michelebergo/nina-ai-assistant/releases/download/v1.0.0.1/NINA.Plugin.AIAssistant.dll",
-    "Type": "DLL",
-    "Checksum": "18F7D18DEB3F03F7052B13D6334AE1C5B7B3115F2A8B209CE3602F437C6BF402",
-    "ChecksumType": "SHA256"
-  }
+    "Image Analysis",
+    "Automation",
+    "GitHub Models"
+  ]
 }

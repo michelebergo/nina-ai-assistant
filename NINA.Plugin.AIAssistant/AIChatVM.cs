@@ -4,6 +4,8 @@ using NINA.Core.Utility;
 using NINA.Plugin.AIAssistant.AI;
 using NINA.Plugin.AIAssistant.AI.MCP;
 using NINA.Equipment.Interfaces.ViewModel;
+using NINA.WPF.Base.ViewModel;
+using NINA.Profile.Interfaces;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
@@ -11,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows;
 
 // Resolve ambiguity - use NINA's RelayCommand for simple commands
 using MvvmRelayCommand = CommunityToolkit.Mvvm.Input.RelayCommand;
@@ -19,59 +22,83 @@ using MvvmAsyncRelayCommand = CommunityToolkit.Mvvm.Input.AsyncRelayCommand;
 namespace NINA.Plugin.AIAssistant
 {
     [Export(typeof(IDockableVM))]
-    public class AIChatVM : ObservableObject, IDockableVM
+    [PartCreationPolicy(CreationPolicy.Shared)]
+    public class AIChatVM : DockableVM
     {
-        private string _title = "ai assistant";
-        public string Title
+        [ImportingConstructor]
+        public AIChatVM(IProfileService profileService) : base(profileService)
         {
-            get => _title;
-            set => SetProperty(ref _title, value);
+            Title = "AI Assistant";
+            
+            // Create a chat bubble icon with sparkle
+            var geometry = new GeometryGroup();
+            
+            // Chat bubble (rounded rectangle)
+            var bubble = new RectangleGeometry(new System.Windows.Rect(2, 2, 12, 10), 2, 2);
+            geometry.Children.Add(bubble);
+            
+            // Small tail for chat bubble
+            var tail = new PathGeometry();
+            var figure = new PathFigure { StartPoint = new System.Windows.Point(4, 12) };
+            figure.Segments.Add(new LineSegment(new System.Windows.Point(2, 14), true));
+            figure.Segments.Add(new LineSegment(new System.Windows.Point(6, 12), true));
+            tail.Figures.Add(figure);
+            geometry.Children.Add(tail);
+            
+            // Sparkle/star effect (AI indicator)
+            var star = new PathGeometry();
+            var starFig = new PathFigure { StartPoint = new System.Windows.Point(12, 3) };
+            starFig.Segments.Add(new LineSegment(new System.Windows.Point(13, 5), true));
+            starFig.Segments.Add(new LineSegment(new System.Windows.Point(15, 4), true));
+            starFig.Segments.Add(new LineSegment(new System.Windows.Point(13.5, 6), true));
+            starFig.Segments.Add(new LineSegment(new System.Windows.Point(14, 8), true));
+            starFig.Segments.Add(new LineSegment(new System.Windows.Point(12, 7), true));
+            starFig.Segments.Add(new LineSegment(new System.Windows.Point(10, 8), true));
+            starFig.Segments.Add(new LineSegment(new System.Windows.Point(10.5, 6), true));
+            starFig.Segments.Add(new LineSegment(new System.Windows.Point(9, 4), true));
+            starFig.Segments.Add(new LineSegment(new System.Windows.Point(11, 5), true));
+            starFig.IsClosed = true;
+            star.Figures.Add(starFig);
+            geometry.Children.Add(star);
+            
+            geometry.Freeze();
+            ImageGeometry = geometry;
+
+            // Get AIService from plugin instance
+            _aiService = AIAssistantPlugin.Instance?.GetAIService();
+
+            // Initialize commands
+            SendMessageCommand = new MvvmAsyncRelayCommand(SendMessageAsync);
+            ClearChatCommand = new MvvmRelayCommand(ClearChat);
+
+            // Add welcome message
+            var mcpEnabled = AIAssistantPlugin.Instance?.MCPEnabled ?? false;
+            var welcomeMsg = "Hello! I'm your AI assistant for astrophotography. Ask me anything about:\n\n" +
+                         "• Equipment settings and optimization\n" +
+                         "• Target selection and planning\n" +
+                         "• Image processing tips\n" +
+                         "• Troubleshooting issues\n\n";
+            
+            if (mcpEnabled)
+            {
+                welcomeMsg += "🤖 **MCP Control Enabled** - I can directly control your NINA equipment!\n" +
+                             "Try: \"Connect to NINA\", \"Show equipment status\", \"Take a 10s exposure\"\n\n";
+            }
+            
+            welcomeMsg += "Make sure you've configured your API key in the plugin settings!";
+            
+            Messages.Add(new ChatMessage
+            {
+                Role = "assistant",
+                Content = welcomeMsg,
+                Timestamp = DateTime.Now
+            });
         }
+
+        public override bool IsTool => true;
         
-        public bool IsTool => true;
-        
-        private bool _isVisible = true;
-        public bool IsVisible
-        {
-            get => _isVisible;
-            set => SetProperty(ref _isVisible, value);
-        }
-        
-        private bool _hasSettings = false;
-        public bool HasSettings
-        {
-            get => _hasSettings;
-            set => SetProperty(ref _hasSettings, value);
-        }
-
-        public string ContentId => "AIAssistant_Chat";
-        
-        private bool _canClose = true;
-        public bool CanClose
-        {
-            get => _canClose;
-            set => SetProperty(ref _canClose, value);
-        }
-
-        private bool _isClosed = false;
-        public bool IsClosed
-        {
-            get => _isClosed;
-            set => SetProperty(ref _isClosed, value);
-        }
-
-        private GeometryGroup? _imageGeometry;
-        public GeometryGroup? ImageGeometry
-        {
-            get => _imageGeometry;
-            set => SetProperty(ref _imageGeometry, value);
-        }
-
-        public ICommand? HideCommand { get; private set; }
-
         public void Hide(object? o)
         {
-            IsVisible = false;
             IsClosed = true;
         }
 
@@ -103,39 +130,6 @@ namespace NINA.Plugin.AIAssistant
 
         private readonly AIService? _aiService;
         private bool _mcpInitialized = false;
-
-        public AIChatVM()
-        {
-            HideCommand = new CommunityToolkit.Mvvm.Input.RelayCommand<object?>(Hide);
-            SendMessageCommand = new MvvmAsyncRelayCommand(SendMessageAsync);
-            ClearChatCommand = new MvvmRelayCommand(ClearChat);
-            
-            // Get AIService from plugin instance
-            _aiService = AIAssistantPlugin.Instance?.GetAIService();
-            
-            // Add welcome message
-            var mcpEnabled = AIAssistantPlugin.Instance?.MCPEnabled ?? false;
-            var welcomeMsg = "Hello! I'm your AI assistant for astrophotography. Ask me anything about:\n\n" +
-                         "• Equipment settings and optimization\n" +
-                         "• Target selection and planning\n" +
-                         "• Image processing tips\n" +
-                         "• Troubleshooting issues\n\n";
-            
-            if (mcpEnabled)
-            {
-                welcomeMsg += "🤖 **MCP Control Enabled** - I can directly control your NINA equipment!\n" +
-                             "Try: \"Connect to NINA\", \"Show equipment status\", \"Take a 10s exposure\"\n\n";
-            }
-            
-            welcomeMsg += "Make sure you've configured your API key in the plugin settings!";
-            
-            Messages.Add(new ChatMessage
-            {
-                Role = "assistant",
-                Content = welcomeMsg,
-                Timestamp = DateTime.Now
-            });
-        }
 
         private async Task InitializeMCPIfNeeded()
         {

@@ -23,10 +23,26 @@ namespace NINA.Plugin.AIAssistant
         public static AIAssistantPlugin? Instance { get; private set; }
 
         [ImportingConstructor]
-        public AIAssistantPlugin(IProfileService profileService)
+        public AIAssistantPlugin(IProfileService profileService, 
+            [ImportMany] IEnumerable<NINA.Equipment.Interfaces.ViewModel.IDockableVM> dockables,
+            [ImportMany] IEnumerable<System.Windows.ResourceDictionary> resourceDictionaries)
         {
             Instance = this;
             this.profileService = profileService;
+
+            Logger.Info($"Plugin constructor: Found {dockables.Count()} dockable panels");
+            foreach (var dockable in dockables)
+            {
+                Logger.Info($"Dockable found: {dockable.Title} (ContentId: {dockable.ContentId})");
+            }
+
+            // Merge resource dictionaries into application resources
+            Logger.Info($"Plugin constructor: Found {resourceDictionaries.Count()} resource dictionaries");
+            foreach (var dict in resourceDictionaries)
+            {
+                System.Windows.Application.Current?.Resources.MergedDictionaries.Add(dict);
+                Logger.Info($"Merged resource dictionary: {dict.GetType().Name}");
+            }
 
             if (Settings.Default.UpdateSettings)
             {

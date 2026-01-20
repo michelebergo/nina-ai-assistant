@@ -21,13 +21,12 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyVersion("1.0.0.3")]
 [assembly: AssemblyFileVersion("1.0.0.3")]
 
-// NINA Plugin Manifest Metadata
-[assembly: AssemblyMetadata("Homepage", "https://github.com/michelebergo/nina-ai-assistant")]
-[assembly: AssemblyMetadata("Repository", "https://github.com/michelebergo/nina-ai-assistant")]
+// Plugin metadata
+[assembly: AssemblyMetadata("MinimumApplicationVersion", "3.0.0.0")]
 [assembly: AssemblyMetadata("License", "MIT")]
 [assembly: AssemblyMetadata("LicenseURL", "https://github.com/michelebergo/nina-ai-assistant/blob/main/LICENSE")]
+[assembly: AssemblyMetadata("Repository", "https://github.com/michelebergo/nina-ai-assistant")]
+[assembly: AssemblyMetadata("FeaturedImageURL", "https://raw.githubusercontent.com/michelebergo/nina-ai-assistant/main/icon.png")]
 [assembly: AssemblyMetadata("ChangelogURL", "https://github.com/michelebergo/nina-ai-assistant/blob/main/CHANGELOG.md")]
 [assembly: AssemblyMetadata("Tags", "ai,assistant,chat,mcp,automation")]
-[assembly: AssemblyMetadata("MinimumApplicationVersion", "3.0.0.0")]
-[assembly: AssemblyMetadata("LongDescription", "Powerful multi-provider AI assistant for NINA with MCP equipment control. Supports GitHub Models (free), OpenAI, Anthropic Claude, Google Gemini, Ollama (local), and OpenRouter. Features Anthropic's tool-use API for natural language equipment control via NINA Advanced API - control your camera, mount, focuser, filter wheel, and more through conversation.")]
-[assembly: AssemblyMetadata("FeaturedImageURL", "https://raw.githubusercontent.com/michelebergo/nina-ai-assistant/main/icon.png")]
+[assembly: AssemblyMetadata("LongDescription", "Powerful multi-provider AI assistant for NINA with MCP equipment control. Supports GitHub Models (free), OpenAI, Anthropic Claude, Google Gemini, Ollama (local), and OpenRouter.")]
