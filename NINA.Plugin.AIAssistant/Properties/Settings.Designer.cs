@@ -53,7 +53,7 @@ namespace NINA.Plugin.AIAssistant.Properties {
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("gpt-4o-mini")]
+        [global::System.Configuration.DefaultSettingValueAttribute("gpt-4o")]
         public string GitHubModelId {
             get {
                 return ((string)(this["GitHubModelId"]));
@@ -78,7 +78,7 @@ namespace NINA.Plugin.AIAssistant.Properties {
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("gpt-4o-mini")]
+        [global::System.Configuration.DefaultSettingValueAttribute("gpt-4o")]
         public string OpenAIModelId {
             get {
                 return ((string)(this["OpenAIModelId"]));
@@ -103,7 +103,7 @@ namespace NINA.Plugin.AIAssistant.Properties {
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("claude-sonnet-4-20250514")]
+        [global::System.Configuration.DefaultSettingValueAttribute("claude-sonnet-4.5")]
         public string AnthropicModelId {
             get {
                 return ((string)(this["AnthropicModelId"]));
@@ -128,7 +128,7 @@ namespace NINA.Plugin.AIAssistant.Properties {
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("gemini-1.5-flash")]
+        [global::System.Configuration.DefaultSettingValueAttribute("gemini-2.0-flash-exp")]
         public string GoogleModelId {
             get {
                 return ((string)(this["GoogleModelId"]));
@@ -222,6 +222,30 @@ namespace NINA.Plugin.AIAssistant.Properties {
             }
             set {
                 this["MCPNinaPort"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("python")]
+        public string ExternalMCPPythonPath {
+            get {
+                return ((string)(this["ExternalMCPPythonPath"]));
+            }
+            set {
+                this["ExternalMCPPythonPath"] = value;
+            }
+        }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ExternalMCPScriptPath {
+            get {
+                return ((string)(this["ExternalMCPScriptPath"]));
+            }
+            set {
+                this["ExternalMCPScriptPath"] = value;
             }
         }
     }

@@ -24,9 +24,9 @@
         "AltScreenshotURL": ""
     },
     "Installer": {
-        "URL": "https://github.com/michelebergo/nina-ai-assistant/releases/download/v1.0.0.4/AIAssistant-1.0.0.4.zip",
+        "URL": "https://github.com/michelebergo/nina-ai-assistant/releases/download/v1.0.0.5/AIAssistant-1.0.0.5.zip",
         "Type": "DLL",
-        "Checksum": "0E0D2531F44079EA55192C38EFC3F84284B3F6E8B6E2F68018F625B82448211B",
+        "Checksum": "7ABEC4D2EE08760404FDEDE3C7D75BBD333780145F90BDF8C4B6B69DF51E2BD2",
         "ChecksumType": "SHA256"
     }
 }

@@ -98,8 +98,8 @@ namespace NINA.Plugin.AIAssistant.AI
             {
                 AIProviderType.GitHub => new List<AIModelInfo>
                 {
+                    new() { Id = "gpt-4o", DisplayName = "GPT-4o", Provider = provider, IsFree = true, Description = "Most capable (default)" },
                     new() { Id = "gpt-4o-mini", DisplayName = "GPT-4o Mini", Provider = provider, IsFree = true, Description = "Fast, affordable" },
-                    new() { Id = "gpt-4o", DisplayName = "GPT-4o", Provider = provider, IsFree = true, Description = "Most capable" },
                     new() { Id = "o1-mini", DisplayName = "o1 Mini", Provider = provider, IsFree = true, Description = "Reasoning model" },
                     new() { Id = "o1", DisplayName = "o1", Provider = provider, IsFree = true, Description = "Advanced reasoning" },
                     new() { Id = "Llama-3.3-70B-Instruct", DisplayName = "Llama 3.3 70B", Provider = provider, IsFree = true, Description = "Open source" },
@@ -107,8 +107,8 @@ namespace NINA.Plugin.AIAssistant.AI
                 },
                 AIProviderType.OpenAI => new List<AIModelInfo>
                 {
+                    new() { Id = "gpt-4o", DisplayName = "GPT-4o", Provider = provider, IsFree = false, Description = "Most capable (default)" },
                     new() { Id = "gpt-4o-mini", DisplayName = "GPT-4o Mini", Provider = provider, IsFree = false, Description = "Fast, affordable" },
-                    new() { Id = "gpt-4o", DisplayName = "GPT-4o", Provider = provider, IsFree = false, Description = "Most capable" },
                     new() { Id = "gpt-4-turbo", DisplayName = "GPT-4 Turbo", Provider = provider, IsFree = false, Description = "128K context" },
                     new() { Id = "gpt-3.5-turbo", DisplayName = "GPT-3.5 Turbo", Provider = provider, IsFree = false, Description = "Legacy, cheap" },
                     new() { Id = "o1-mini", DisplayName = "o1 Mini", Provider = provider, IsFree = false, Description = "Reasoning" },
@@ -116,15 +116,18 @@ namespace NINA.Plugin.AIAssistant.AI
                 },
                 AIProviderType.Anthropic => new List<AIModelInfo>
                 {
+                    new() { Id = "claude-sonnet-4.5", DisplayName = "Claude Sonnet 4.5", Provider = provider, IsFree = false, Description = "Superior, latest (default)" },
+                    new() { Id = "claude-sonnet-4-20250514", DisplayName = "Claude Sonnet 4", Provider = provider, IsFree = false, Description = "May 2025 release" },
+                    new() { Id = "claude-3-7-sonnet-20250219", DisplayName = "Claude 3.7 Sonnet", Provider = provider, IsFree = false, Description = "Advanced Feb 2025" },
                     new() { Id = "claude-3-5-sonnet-20241022", DisplayName = "Claude 3.5 Sonnet", Provider = provider, IsFree = false, Description = "Best balance" },
                     new() { Id = "claude-3-5-haiku-20241022", DisplayName = "Claude 3.5 Haiku", Provider = provider, IsFree = false, Description = "Fast, cheap" },
-                    new() { Id = "claude-3-opus-20240229", DisplayName = "Claude 3 Opus", Provider = provider, IsFree = false, Description = "Most capable" },
+                    new() { Id = "claude-3-opus-20240229", DisplayName = "Claude 3 Opus", Provider = provider, IsFree = false, Description = "Legacy flagship" },
                 },
                 AIProviderType.Google => new List<AIModelInfo>
                 {
+                    new() { Id = "gemini-2.0-flash-exp", DisplayName = "Gemini 2.0 Flash", Provider = provider, IsFree = true, Description = "Latest (default)" },
                     new() { Id = "gemini-1.5-flash", DisplayName = "Gemini 1.5 Flash", Provider = provider, IsFree = true, Description = "Fast, free tier" },
                     new() { Id = "gemini-1.5-pro", DisplayName = "Gemini 1.5 Pro", Provider = provider, IsFree = true, Description = "More capable" },
-                    new() { Id = "gemini-2.0-flash-exp", DisplayName = "Gemini 2.0 Flash", Provider = provider, IsFree = true, Description = "Latest" },
                 },
                 AIProviderType.Ollama => new List<AIModelInfo>
                 {

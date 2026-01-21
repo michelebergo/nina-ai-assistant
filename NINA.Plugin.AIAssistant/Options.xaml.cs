@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -47,7 +48,7 @@ namespace NINA.Plugin.AIAssistant
             }
         }
 
-        private void ProviderSelector_Changed(object sender, SelectionChangedEventArgs e)
+        private async void ProviderSelector_Changed(object sender, SelectionChangedEventArgs e)
         {
             var comboBox = sender as ComboBox;
             if (comboBox?.SelectedItem is ComboBoxItem selectedItem && 
@@ -59,6 +60,9 @@ namespace NINA.Plugin.AIAssistant
                 {
                     plugin.SelectedProvider = providerType;
                     UpdateProviderStatus(comboBox, plugin);
+                    
+                    // Load available models for the selected provider
+                    await LoadModelsForProvider(providerType, plugin);
                 }
             }
         }
@@ -81,6 +85,50 @@ namespace NINA.Plugin.AIAssistant
                 _ => ""
             };
             statusText.Text = status;
+        }
+
+        #endregion
+
+        #region Model ComboBox Loaded Handlers
+
+        private async void GitHubModel_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is ComboBox comboBox && comboBox.DataContext is AIAssistantPlugin plugin)
+            {
+                await LoadModelsForProvider(AIProviderType.GitHub, plugin);
+            }
+        }
+
+        private async void OpenAIModel_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is ComboBox comboBox && comboBox.DataContext is AIAssistantPlugin plugin)
+            {
+                await LoadModelsForProvider(AIProviderType.OpenAI, plugin);
+            }
+        }
+
+        private async void AnthropicModel_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is ComboBox comboBox && comboBox.DataContext is AIAssistantPlugin plugin)
+            {
+                await LoadModelsForProvider(AIProviderType.Anthropic, plugin);
+            }
+        }
+
+        private async void GoogleModel_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is ComboBox comboBox && comboBox.DataContext is AIAssistantPlugin plugin)
+            {
+                await LoadModelsForProvider(AIProviderType.Google, plugin);
+            }
+        }
+
+        private async void OllamaModel_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is ComboBox comboBox && comboBox.DataContext is AIAssistantPlugin plugin)
+            {
+                await LoadModelsForProvider(AIProviderType.Ollama, plugin);
+            }
         }
 
         #endregion
@@ -138,12 +186,15 @@ namespace NINA.Plugin.AIAssistant
                 var credential = new AzureKeyCredential(plugin.GitHubApiKey);
                 var client = new ChatCompletionsClient(endpoint, credential);
 
-                var response = await client.CompleteAsync(new ChatCompletionsOptions
+                var options = new ChatCompletionsOptions
                 {
-                    Model = plugin.GitHubModelId ?? "gpt-4o-mini",
-                    Messages = { new ChatRequestUserMessage("Say 'OK'") },
-                    MaxTokens = 5
-                });
+                    Model = plugin.GitHubModelId ?? "gpt-4o",
+                    Messages = { new ChatRequestUserMessage("Say 'OK'") }
+                };
+                // GitHub Models uses max_completion_tokens instead of max_tokens
+                options.AdditionalProperties["max_completion_tokens"] = BinaryData.FromObjectAsJson(5);
+
+                var response = await client.CompleteAsync(options);
 
                 ShowResult(resultTextBlock, $"✅ GitHub API key is valid!", Colors.LightGreen);
             }
@@ -612,6 +663,161 @@ namespace NINA.Plugin.AIAssistant
                 FileName = "https://github.com/michelebergo/nina_mcp_server",
                 UseShellExecute = true
             });
+        }
+
+        private void GetExternalMCPDocs_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "https://github.com/michelebergo/nina-ai-assistant/blob/main/EXTERNAL_MCP_SETUP.md",
+                UseShellExecute = true
+            });
+        }
+
+        private void GetExternalMCPExample_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "https://github.com/michelebergo/nina-ai-assistant/blob/main/nina_advanced_api_mcp_server.py",
+                UseShellExecute = true
+            });
+        }
+
+        #endregion
+
+        #region Model Loading
+
+        private async Task LoadModelsForProvider(AIProviderType providerType, AIAssistantPlugin plugin)
+        {
+            try
+            {
+                IAIProvider? provider = null;
+                ComboBox? modelComboBox = null;
+                string? currentModel = null;
+
+                // Find the ComboBox and create provider based on type
+                switch (providerType)
+                {
+                    case AIProviderType.GitHub:
+                        modelComboBox = FindControl<ComboBox>("GitHubModelComboBox");
+                        currentModel = plugin.GitHubModelId;
+                        if (!string.IsNullOrWhiteSpace(plugin.GitHubApiKey))
+                        {
+                            provider = new GitHubModelsProvider();
+                            await provider.InitializeAsync(new AIProviderConfig
+                            {
+                                ApiKey = plugin.GitHubApiKey,
+                                ModelId = currentModel
+                            });
+                        }
+                        break;
+
+                    case AIProviderType.OpenAI:
+                        modelComboBox = FindControl<ComboBox>("OpenAIModelComboBox");
+                        currentModel = plugin.OpenAIModelId;
+                        if (!string.IsNullOrWhiteSpace(plugin.OpenAIApiKey))
+                        {
+                            provider = new OpenAIProvider();
+                            await provider.InitializeAsync(new AIProviderConfig
+                            {
+                                ApiKey = plugin.OpenAIApiKey,
+                                ModelId = currentModel
+                            });
+                        }
+                        break;
+
+                    case AIProviderType.Anthropic:
+                        modelComboBox = FindControl<ComboBox>("AnthropicModelComboBox");
+                        currentModel = plugin.AnthropicModelId;
+                        if (!string.IsNullOrWhiteSpace(plugin.AnthropicApiKey))
+                        {
+                            provider = new AnthropicProvider();
+                            await provider.InitializeAsync(new AIProviderConfig
+                            {
+                                ApiKey = plugin.AnthropicApiKey,
+                                ModelId = currentModel
+                            });
+                        }
+                        break;
+
+                    case AIProviderType.Google:
+                        modelComboBox = FindControl<ComboBox>("GoogleModelComboBox");
+                        currentModel = plugin.GoogleModelId;
+                        if (!string.IsNullOrWhiteSpace(plugin.GoogleApiKey))
+                        {
+                            provider = new GoogleProvider();
+                            await provider.InitializeAsync(new AIProviderConfig
+                            {
+                                ApiKey = plugin.GoogleApiKey,
+                                ModelId = currentModel
+                            });
+                        }
+                        break;
+
+                    case AIProviderType.Ollama:
+                        modelComboBox = FindControl<ComboBox>("OllamaModelComboBox");
+                        currentModel = plugin.OllamaModelId;
+                        provider = new OllamaProvider();
+                        await provider.InitializeAsync(new AIProviderConfig
+                        {
+                            ApiKey = string.Empty,
+                            ModelId = currentModel,
+                            Endpoint = plugin.OllamaEndpoint
+                        });
+                        break;
+                }
+
+                if (modelComboBox != null && provider != null)
+                {
+                    var models = await provider.GetAvailableModelsAsync();
+                    
+                    modelComboBox.Items.Clear();
+                    foreach (var model in models)
+                    {
+                        var item = new ComboBoxItem { Content = model };
+                        if (model == currentModel)
+                            item.IsSelected = true;
+                        modelComboBox.Items.Add(item);
+                    }
+
+                    // If current model not in list, add it and select it
+                    if (!string.IsNullOrEmpty(currentModel) && !models.Any(m => m == currentModel))
+                    {
+                        var item = new ComboBoxItem { Content = currentModel, IsSelected = true };
+                        modelComboBox.Items.Insert(0, item);
+                    }
+
+                    NINA.Core.Utility.Logger.Info($"Loaded {models.Length} models for {providerType}");
+                }
+            }
+            catch (Exception ex)
+            {
+                NINA.Core.Utility.Logger.Error($"Failed to load models for {providerType}: {ex.Message}");
+            }
+        }
+
+        private T? FindControl<T>(string name) where T : FrameworkElement
+        {
+            return FindControlInVisualTree<T>(Application.Current.MainWindow, name);
+        }
+
+        private T? FindControlInVisualTree<T>(DependencyObject parent, string name) where T : FrameworkElement
+        {
+            if (parent == null) return null;
+
+            int childCount = System.Windows.Media.VisualTreeHelper.GetChildrenCount(parent);
+            for (int i = 0; i < childCount; i++)
+            {
+                var child = System.Windows.Media.VisualTreeHelper.GetChild(parent, i);
+                
+                if (child is T element && element.Name == name)
+                    return element;
+
+                var result = FindControlInVisualTree<T>(child, name);
+                if (result != null)
+                    return result;
+            }
+            return null;
         }
 
         #endregion

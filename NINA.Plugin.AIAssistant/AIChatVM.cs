@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using NINA.Core.Utility;
 using NINA.Plugin.AIAssistant.AI;
 using NINA.Plugin.AIAssistant.AI.MCP;
+using NINA.Plugin.AIAssistant.MCP;
 using NINA.Equipment.Interfaces.ViewModel;
 using NINA.WPF.Base.ViewModel;
 using NINA.Profile.Interfaces;
@@ -156,14 +157,17 @@ namespace NINA.Plugin.AIAssistant
                 return;
             }
             
-            // Only enable MCP for Anthropic provider
+            // Initialize external MCP server if configured
+            await InitializeExternalMCPAsync(plugin);
+            
+            // Enable MCP for Anthropic and Google providers
             if (_aiService?.ActiveProviderType == AIProviderType.Anthropic)
             {
                 var provider = _aiService.GetActiveProvider() as AnthropicProvider;
                 if (provider != null)
                 {
                     var mcpConfig = plugin.GetMCPConfig();
-                    Logger.Info($"AIChatVM: Initializing MCP with config - Host: {mcpConfig.NinaHost}, Port: {mcpConfig.NinaPort}, Enabled: {mcpConfig.Enabled}");
+                    Logger.Info($"AIChatVM: Initializing MCP for Anthropic - Host: {mcpConfig.NinaHost}, Port: {mcpConfig.NinaPort}, Enabled: {mcpConfig.Enabled}");
                     
                     var success = await provider.EnableMCPAsync(mcpConfig);
                     _mcpInitialized = success;
@@ -171,7 +175,7 @@ namespace NINA.Plugin.AIAssistant
                     if (success)
                     {
                         Logger.Info("AIChatVM: MCP initialized successfully for Anthropic provider");
-                        StatusMessage = "🤖 MCP Connected";
+                        StatusMessage = "🤖 MCP Connected (Claude)";
                     }
                     else
                     {
@@ -184,9 +188,80 @@ namespace NINA.Plugin.AIAssistant
                     Logger.Warning("AIChatVM: Could not cast active provider to AnthropicProvider");
                 }
             }
+            else if (_aiService?.ActiveProviderType == AIProviderType.Google)
+            {
+                var provider = _aiService.GetActiveProvider() as GoogleProvider;
+                if (provider != null)
+                {
+                    var mcpConfig = plugin.GetMCPConfig();
+                    Logger.Info($"AIChatVM: Initializing MCP for Google Gemini - Host: {mcpConfig.NinaHost}, Port: {mcpConfig.NinaPort}, Enabled: {mcpConfig.Enabled}");
+                    
+                    var success = await provider.EnableMCPAsync(mcpConfig);
+                    _mcpInitialized = success;
+                    
+                    if (success)
+                    {
+                        Logger.Info("AIChatVM: MCP initialized successfully for Google provider");
+                        StatusMessage = "🤖 MCP Connected (Gemini)";
+                    }
+                    else
+                    {
+                        Logger.Warning("AIChatVM: MCP initialization failed - check NINA Advanced API connection");
+                        StatusMessage = "⚠️ MCP connection failed";
+                    }
+                }
+                else
+                {
+                    Logger.Warning("AIChatVM: Could not cast active provider to GoogleProvider");
+                }
+            }
             else
             {
-                Logger.Info($"AIChatVM: MCP not enabled - provider is {_aiService?.ActiveProviderType}, need Anthropic");
+                Logger.Info($"AIChatVM: MCP not supported for provider {_aiService?.ActiveProviderType}, only Anthropic and Google");
+            }
+        }
+
+        private async Task InitializeExternalMCPAsync(AIAssistantPlugin plugin)
+        {
+            try
+            {
+                var pythonPath = plugin.ExternalMCPPythonPath;
+                var scriptPath = plugin.ExternalMCPScriptPath;
+                
+                if (string.IsNullOrEmpty(pythonPath) || string.IsNullOrEmpty(scriptPath))
+                {
+                    Logger.Info("AIChatVM: External MCP not configured");
+                    return;
+                }
+                
+                var externalMCP = new ExternalMCPClient();
+                var started = await externalMCP.StartServerAsync(pythonPath, scriptPath);
+                
+                if (started)
+                {
+                    Logger.Info($"AIChatVM: External MCP server started: {externalMCP.ServerName} v{externalMCP.ServerVersion}");
+                    
+                    // Pass to active provider
+                    if (_aiService?.ActiveProviderType == AIProviderType.Anthropic)
+                    {
+                        var provider = _aiService.GetActiveProvider() as AnthropicProvider;
+                        provider?.SetExternalMCP(externalMCP);
+                    }
+                    else if (_aiService?.ActiveProviderType == AIProviderType.Google)
+                    {
+                        var provider = _aiService.GetActiveProvider() as GoogleProvider;
+                        provider?.SetExternalMCP(externalMCP);
+                    }
+                }
+                else
+                {
+                    Logger.Warning("AIChatVM: Failed to start external MCP server");
+                    externalMCP.Dispose();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"AIChatVM: External MCP initialization error: {ex.Message}");
             }
         }
 

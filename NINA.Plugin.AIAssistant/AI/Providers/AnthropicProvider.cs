@@ -84,6 +84,15 @@ namespace NINA.Plugin.AIAssistant.AI
             }
         }
 
+        /// <summary>
+        /// Set external MCP client for additional tools (not implemented for Anthropic yet)
+        /// </summary>
+        public void SetExternalMCP(NINA.Plugin.AIAssistant.MCP.ExternalMCPClient externalMcpClient)
+        {
+            Logger.Info("External MCP not yet implemented for Anthropic provider");
+            // TODO: Implement external MCP support for Claude similar to Google
+        }
+
         public async Task<AIResponse> SendRequestAsync(AIRequest request, CancellationToken cancellationToken = default)
         {
             if (_httpClient == null || _config == null)
@@ -122,8 +131,8 @@ namespace NINA.Plugin.AIAssistant.AI
 
             var requestBody = new
             {
-                // Latest: claude-sonnet-4-20250514 (Claude 4, May 2025), claude-3-7-sonnet-20250219, claude-3-5-sonnet-20241022
-                model = _config!.ModelId ?? "claude-sonnet-4-20250514",
+                // Latest: claude-sonnet-4.5 (Claude 4.5, superior), claude-sonnet-4-20250514 (Claude 4, May 2025), claude-3-7-sonnet-20250219
+                model = _config!.ModelId ?? "claude-sonnet-4.5",
                 max_tokens = request.MaxTokens,
                 system = request.SystemPrompt ?? GetDefaultSystemPrompt(),
                 messages = messages
@@ -182,8 +191,8 @@ namespace NINA.Plugin.AIAssistant.AI
                 
                 var requestBody = new
                 {
-                    // Latest: claude-sonnet-4-20250514 (Claude 4) with extended tool use capability
-                    model = _config!.ModelId ?? "claude-sonnet-4-20250514",
+                    // Latest: claude-sonnet-4.5 (Claude 4.5) with extended tool use capability
+                    model = _config!.ModelId ?? "claude-sonnet-4.5",
                     max_tokens = request.MaxTokens,
                     system = systemPrompt,
                     tools = toolDefinitions,
@@ -368,14 +377,60 @@ For example, if user says 'check equipment' or 'show status', USE nina_get_statu
 
         public async Task<string[]> GetAvailableModelsAsync(CancellationToken cancellationToken = default)
         {
-            return await Task.FromResult(new[]
+            try
             {
+                // Anthropic doesn't have a public models API endpoint
+                // Return curated list of known models with fallback
+                if (_httpClient == null || _config == null)
+                    return GetDefaultModels();
+
+                // Try to validate API key by making a minimal request
+                var testRequest = new HttpRequestMessage(HttpMethod.Post, "https://api.anthropic.com/v1/messages")
+                {
+                    Headers = 
+                    {
+                        { "x-api-key", _config.ApiKey },
+                        { "anthropic-version", "2023-06-01" }
+                    },
+                    Content = new StringContent(
+                        JsonConvert.SerializeObject(new 
+                        { 
+                            model = "claude-sonnet-4.5",
+                            max_tokens = 1,
+                            messages = new[] { new { role = "user", content = "test" } }
+                        }),
+                        Encoding.UTF8,
+                        "application/json")
+                };
+
+                var response = await _httpClient.SendAsync(testRequest, cancellationToken);
+                
+                // If we get any response (even error), API key works - return full list
+                // 401 means bad key, anything else means key is valid
+                if (response.StatusCode != System.Net.HttpStatusCode.Unauthorized)
+                    return GetDefaultModels();
+                
+                // Bad API key - return limited list
+                return new[] { "claude-sonnet-4.5" };
+            }
+            catch (Exception ex)
+            {
+                Logger.Warning($"Failed to validate Anthropic access: {ex.Message}");
+                return GetDefaultModels();
+            }
+        }
+
+        private string[] GetDefaultModels()
+        {
+            return new[]
+            {
+                "claude-sonnet-4.5",
                 "claude-sonnet-4-20250514",
                 "claude-3-7-sonnet-20250219",
                 "claude-3-5-sonnet-latest",
                 "claude-3-5-haiku-latest",
                 "claude-3-opus-latest"
-            });
+            };
         }
     }
 }

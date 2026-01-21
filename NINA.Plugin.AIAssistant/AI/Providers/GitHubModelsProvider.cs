@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,6 +10,7 @@ using Azure;
 using Azure.AI.Inference;
 using NINA.Core.Utility;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace NINA.Plugin.AIAssistant.AI
 {
@@ -18,6 +22,7 @@ namespace NINA.Plugin.AIAssistant.AI
     {
         private ChatCompletionsClient? _client;
         private AIProviderConfig? _config;
+        private HttpClient? _httpClient;
 
         public AIProviderType ProviderType => AIProviderType.GitHub;
         public string DisplayName => "GitHub Models (Free)";
@@ -28,6 +33,8 @@ namespace NINA.Plugin.AIAssistant.AI
             try
             {
                 _config = config;
+                _httpClient = new HttpClient();
+                _httpClient.Timeout = TimeSpan.FromSeconds(30);
 
                 // GitHub Models endpoint
                 var endpoint = new Uri("https://models.inference.ai.azure.com");
@@ -65,11 +72,12 @@ namespace NINA.Plugin.AIAssistant.AI
                 var chatOptions = new ChatCompletionsOptions
                 {
                     Messages = { messages[0], messages[1] },
-                    Temperature = (float)request.Temperature,
-                    MaxTokens = request.MaxTokens,
-                    // Latest models: gpt-4o (most capable), gpt-4o-mini (fast/efficient), o1-preview/o1-mini (reasoning)
+                    // GitHub Models doesn't support temperature parameter - uses default (1.0)
+                    // Temperature is removed to avoid "unsupported_parameter" errors
                     Model = _config.ModelId ?? "gpt-4o" 
                 };
+                // GitHub Models uses max_completion_tokens instead of max_tokens
+                chatOptions.AdditionalProperties["max_completion_tokens"] = BinaryData.FromObjectAsJson(request.MaxTokens);
 
                 var response = await _client.CompleteAsync(chatOptions, cancellationToken);
                 var result = response.Value;
@@ -118,8 +126,51 @@ namespace NINA.Plugin.AIAssistant.AI
 
         public async Task<string[]> GetAvailableModelsAsync(CancellationToken cancellationToken = default)
         {
-            // GitHub Models available as of January 2026
-            return await Task.FromResult(new[]
+            try
+            {
+                // GitHub Models API endpoint for model listing
+                if (_httpClient == null || _config == null)
+                    return GetDefaultModels();
+
+                var request = new HttpRequestMessage(HttpMethod.Get, "https://models.inference.ai.azure.com/models");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _config.ApiKey);
+                request.Headers.Add("Accept", "application/json");
+
+                var response = await _httpClient.SendAsync(request, cancellationToken);
+                
+                if (!response.IsSuccessStatusCode)
+                {
+                    Logger.Warning($"GitHub Models API returned {response.StatusCode}, using default list");
+                    return GetDefaultModels();
+                }
+
+                var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                var jsonResponse = JObject.Parse(responseContent);
+                var models = jsonResponse["data"]?.ToObject<List<JObject>>();
+
+                if (models == null || models.Count == 0)
+                    return GetDefaultModels();
+
+                var modelIds = models
+                    .Select(m => m["id"]?.ToString())
+                    .Where(id => !string.IsNullOrEmpty(id))
+                    .OrderBy(id => id)
+                    .ToArray();
+
+                Logger.Info($"GitHub Models: Found {modelIds.Length} models via API");
+                return modelIds.Length > 0 ? modelIds : GetDefaultModels();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warning($"Failed to fetch GitHub models: {ex.Message}, using default list");
+                return GetDefaultModels();
+            }
+        }
+
+        private string[] GetDefaultModels()
+        {
+            // GitHub Models available as of January 2026 (fallback)
+            return new[]
             {
                 "gpt-4o",
                 "gpt-4o-mini",
@@ -133,7 +184,7 @@ namespace NINA.Plugin.AIAssistant.AI
                 "claude-sonnet-4-5",
                 "llama-3.3-70b-instruct",
                 "phi-4"
-            });
+            };
         }
     }
 }

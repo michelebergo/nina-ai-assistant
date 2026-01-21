@@ -22,6 +22,33 @@ namespace NINA.Plugin.AIAssistant
 
         public static AIAssistantPlugin? Instance { get; private set; }
 
+        private AIProviderType _selectedProvider;
+        public AIProviderType SelectedProviderInternal
+        {
+            get => _selectedProvider;
+            set
+            {
+                if (_selectedProvider != value)
+                {
+                    _selectedProvider = value;
+                    RaisePropertyChanged();
+                    RaisePropertyChanged(nameof(IsGitHubSelected));
+                    RaisePropertyChanged(nameof(IsOpenAISelected));
+                    RaisePropertyChanged(nameof(IsAnthropicSelected));
+                    RaisePropertyChanged(nameof(IsGoogleSelected));
+                    RaisePropertyChanged(nameof(IsOllamaSelected));
+                    RaisePropertyChanged(nameof(IsOpenRouterSelected));
+                }
+            }
+        }
+
+        public bool IsGitHubSelected => SelectedProviderInternal == AIProviderType.GitHub;
+        public bool IsOpenAISelected => SelectedProviderInternal == AIProviderType.OpenAI;
+        public bool IsAnthropicSelected => SelectedProviderInternal == AIProviderType.Anthropic;
+        public bool IsGoogleSelected => SelectedProviderInternal == AIProviderType.Google;
+        public bool IsOllamaSelected => SelectedProviderInternal == AIProviderType.Ollama;
+        public bool IsOpenRouterSelected => SelectedProviderInternal == AIProviderType.OpenRouter;
+
         [ImportingConstructor]
         public AIAssistantPlugin(IProfileService profileService, 
             [ImportMany] IEnumerable<NINA.Equipment.Interfaces.ViewModel.IDockableVM> dockables,
@@ -85,25 +112,25 @@ namespace NINA.Plugin.AIAssistant
                 {
                     Provider = AIProviderType.GitHub,
                     ApiKey = GitHubApiKey,
-                    ModelId = GitHubModelId ?? "gpt-4o-mini"
+                    ModelId = GitHubModelId ?? "gpt-4o"
                 },
                 AIProviderType.OpenAI => new AIProviderConfig
                 {
                     Provider = AIProviderType.OpenAI,
                     ApiKey = OpenAIApiKey,
-                    ModelId = OpenAIModelId ?? "gpt-4o-mini"
+                    ModelId = OpenAIModelId ?? "gpt-4o"
                 },
                 AIProviderType.Anthropic => new AIProviderConfig
                 {
                     Provider = AIProviderType.Anthropic,
                     ApiKey = AnthropicApiKey,
-                    ModelId = AnthropicModelId ?? "claude-sonnet-4-20250514"
+                    ModelId = AnthropicModelId ?? "claude-sonnet-4.5"
                 },
                 AIProviderType.Google => new AIProviderConfig
                 {
                     Provider = AIProviderType.Google,
                     ApiKey = GoogleApiKey,
-                    ModelId = GoogleModelId ?? "gemini-1.5-flash"
+                    ModelId = GoogleModelId ?? "gemini-2.0-flash-exp"
                 },
                 AIProviderType.Ollama => new AIProviderConfig
                 {
@@ -151,6 +178,7 @@ namespace NINA.Plugin.AIAssistant
             set
             {
                 Settings.Default.SelectedProvider = value.ToString();
+                SelectedProviderInternal = value;
                 CoreUtil.SaveSettings(Settings.Default);
                 RaisePropertyChanged();
                 _ = InitializeAIProviderAsync();
@@ -178,7 +206,7 @@ namespace NINA.Plugin.AIAssistant
         {
             get
             {
-                var value = Settings.Default.GitHubModelId ?? "gpt-4o-mini";
+                var value = Settings.Default.GitHubModelId ?? "gpt-4o";
                 value = SanitizeModelId(value);
                 return value;
             }
@@ -209,7 +237,7 @@ namespace NINA.Plugin.AIAssistant
 
         public string? OpenAIModelId
         {
-            get => SanitizeModelId(Settings.Default.OpenAIModelId ?? "gpt-4o-mini");
+            get => SanitizeModelId(Settings.Default.OpenAIModelId ?? "gpt-4o");
             set
             {
                 Settings.Default.OpenAIModelId = SanitizeModelId(value);
@@ -265,7 +293,7 @@ namespace NINA.Plugin.AIAssistant
 
         public string? GoogleModelId
         {
-            get => SanitizeModelId(Settings.Default.GoogleModelId ?? "gemini-1.5-flash");
+            get => SanitizeModelId(Settings.Default.GoogleModelId ?? "gemini-2.0-flash-exp");
             set
             {
                 Settings.Default.GoogleModelId = SanitizeModelId(value);
@@ -380,6 +408,34 @@ namespace NINA.Plugin.AIAssistant
             };
         }
 
+        /// <summary>
+        /// External MCP Server Python executable path (e.g., python.exe or python3)
+        /// </summary>
+        public string ExternalMCPPythonPath
+        {
+            get => Settings.Default.ExternalMCPPythonPath;
+            set
+            {
+                Settings.Default.ExternalMCPPythonPath = value;
+                CoreUtil.SaveSettings(Settings.Default);
+                RaisePropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// External MCP Server script path
+        /// </summary>
+        public string ExternalMCPScriptPath
+        {
+            get => Settings.Default.ExternalMCPScriptPath;
+            set
+            {
+                Settings.Default.ExternalMCPScriptPath = value;
+                CoreUtil.SaveSettings(Settings.Default);
+                RaisePropertyChanged();
+            }
+        }
+
         #endregion
 
         #region Helper Methods
@@ -387,12 +443,12 @@ namespace NINA.Plugin.AIAssistant
         private string SanitizeModelId(string? value)
         {
             if (string.IsNullOrEmpty(value))
-                return "gpt-4o-mini";
+                return "gpt-4o";
                 
             // Sanitize corrupted values from ComboBoxItem binding issue
             if (value.Contains("system.windows.controls.comboboxitem:", StringComparison.OrdinalIgnoreCase))
             {
-                value = value.Split(':').LastOrDefault()?.Trim() ?? "gpt-4o-mini";
+                value = value.Split(':').LastOrDefault()?.Trim() ?? "gpt-4o";
             }
             return value;
         }

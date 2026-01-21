@@ -1,15 +1,24 @@
-﻿<ResourceDictionary
+<ResourceDictionary
     x:Class="NINA.Plugin.AIAssistant.Options"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:NINA.Plugin.AIAssistant">
+
+    <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
 
     <DataTemplate x:Key="AI Assistant_Options">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
             <StackPanel Orientation="Vertical" Margin="10">
                 
                 <TextBlock Text="AI Assistant Configuration" FontSize="18" FontWeight="Bold" Margin="0,0,0,5"/>
-                <TextBlock TextWrapping="Wrap" Margin="0,0,0,15" FontSize="12" Opacity="0.7">Configure your AI provider. Choose from free options (GitHub Models, Google Gemini, Ollama) or paid services (OpenAI, Anthropic, OpenRouter).</TextBlock>
+                <TextBlock TextWrapping="Wrap" Margin="0,0,0,15" FontSize="12" Opacity="0.7">
+                    <Run Text="Intelligent AI-powered assistant for NINA with advanced capabilities:"/><LineBreak/>
+                    <Run Text="• Multiple AI Providers: GitHub Models (free), OpenAI, Anthropic Claude, Google Gemini, Ollama (local), OpenRouter"/><LineBreak/>
+                    <Run Text="• MCP Equipment Control: Natural language control of cameras, mounts, focusers, filter wheels, guiding, platesolving"/><LineBreak/>
+                    <Run Text="• Image Analysis: Intelligent feedback on captures, HFR, star detection, and quality assessment"/><LineBreak/>
+                    <Run Text="• Dynamic Model Discovery: Automatically fetches latest available AI models from providers"/><LineBreak/>
+                    <Run Text="• Extensible Architecture: Built-in + external MCP servers for custom tool integration"/>
+                </TextBlock>
 
                 <GroupBox Header="Active Provider" Margin="0,0,0,10">
                     <StackPanel Margin="5">
@@ -28,7 +37,8 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="GitHub Models (FREE)" Margin="0,0,0,10">
+                <!-- GitHub Models -->
+                <GroupBox Header="GitHub Models (FREE)" Margin="0,0,0,10" Visibility="{Binding IsGitHubSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel Margin="5">
                         <TextBlock Text="Free tier via GitHub token - No credit card required" FontSize="11" Opacity="0.6" Margin="0,0,0,8"/>
                         <TextBlock Text="GitHub Personal Access Token:" Margin="0,0,0,5"/>
@@ -44,18 +54,12 @@
                         </Grid>
                         <TextBlock x:Name="GitHubTestResult" Margin="0,5,0,0" FontSize="11" TextWrapping="Wrap"/>
                         <TextBlock Text="Model:" Margin="0,10,0,5"/>
-                        <ComboBox SelectedValue="{Binding GitHubModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="200">
-                            <ComboBoxItem Content="gpt-4o-mini" IsSelected="True"/>
-                            <ComboBoxItem Content="gpt-4o"/>
-                            <ComboBoxItem Content="o1-mini"/>
-                            <ComboBoxItem Content="o1"/>
-                            <ComboBoxItem Content="Llama-3.3-70B-Instruct"/>
-                            <ComboBoxItem Content="Mistral-Large-2411"/>
-                        </ComboBox>
+                        <ComboBox x:Name="GitHubModelComboBox" SelectedValue="{Binding GitHubModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="200" Loaded="GitHubModel_Loaded"/>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="OpenAI (PAID)" Margin="0,0,0,10">
+                <!-- OpenAI -->
+                <GroupBox Header="OpenAI (PAID)" Margin="0,0,0,10" Visibility="{Binding IsOpenAISelected, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel Margin="5">
                         <TextBlock Text="GPT-4, GPT-4o, o1 models - Requires OpenAI account with credits" FontSize="11" Opacity="0.6" Margin="0,0,0,8"/>
                         <TextBlock Text="OpenAI API Key:" Margin="0,0,0,5"/>
@@ -71,18 +75,12 @@
                         </Grid>
                         <TextBlock x:Name="OpenAITestResult" Margin="0,5,0,0" FontSize="11" TextWrapping="Wrap"/>
                         <TextBlock Text="Model:" Margin="0,10,0,5"/>
-                        <ComboBox SelectedValue="{Binding OpenAIModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="200">
-                            <ComboBoxItem Content="gpt-4o-mini" IsSelected="True"/>
-                            <ComboBoxItem Content="gpt-4o"/>
-                            <ComboBoxItem Content="gpt-4-turbo"/>
-                            <ComboBoxItem Content="gpt-3.5-turbo"/>
-                            <ComboBoxItem Content="o1-mini"/>
-                            <ComboBoxItem Content="o1-preview"/>
-                        </ComboBox>
+                        <ComboBox x:Name="OpenAIModelComboBox" SelectedValue="{Binding OpenAIModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="200" Loaded="OpenAIModel_Loaded"/>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Anthropic Claude (PAID)" Margin="0,0,0,10">
+                <!-- Anthropic -->
+                <GroupBox Header="Anthropic Claude (PAID)" Margin="0,0,0,10" Visibility="{Binding IsAnthropicSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel Margin="5">
                         <TextBlock Text="Claude 3.5 Sonnet, Opus, Haiku - Requires Anthropic account" FontSize="11" Opacity="0.6" Margin="0,0,0,8"/>
                         <TextBlock Text="Anthropic API Key:" Margin="0,0,0,5"/>
@@ -98,17 +96,12 @@
                         </Grid>
                         <TextBlock x:Name="AnthropicTestResult" Margin="0,5,0,0" FontSize="11" TextWrapping="Wrap"/>
                         <TextBlock Text="Model:" Margin="0,10,0,5"/>
-                        <ComboBox SelectedValue="{Binding AnthropicModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="250">
-                            <ComboBoxItem Content="claude-sonnet-4-20250514" IsSelected="True"/>
-                            <ComboBoxItem Content="claude-3-7-sonnet-20250219"/>
-                            <ComboBoxItem Content="claude-3-5-sonnet-latest"/>
-                            <ComboBoxItem Content="claude-3-5-haiku-latest"/>
-                            <ComboBoxItem Content="claude-3-opus-latest"/>
-                        </ComboBox>
+                        <ComboBox x:Name="AnthropicModelComboBox" SelectedValue="{Binding AnthropicModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="250" Loaded="AnthropicModel_Loaded"/>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Google Gemini (FREE TIER)" Margin="0,0,0,10">
+                <!-- Google Gemini -->
+                <GroupBox Header="Google Gemini (FREE TIER)" Margin="0,0,0,10" Visibility="{Binding IsGoogleSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel Margin="5">
                         <TextBlock Text="Gemini 1.5 Flash/Pro - Free tier available with Google AI Studio" FontSize="11" Opacity="0.6" Margin="0,0,0,8"/>
                         <TextBlock Text="Google API Key:" Margin="0,0,0,5"/>
@@ -124,19 +117,12 @@
                         </Grid>
                         <TextBlock x:Name="GoogleTestResult" Margin="0,5,0,0" FontSize="11" TextWrapping="Wrap"/>
                         <TextBlock Text="Model:" Margin="0,10,0,5"/>
-                        <ComboBox SelectedValue="{Binding GoogleModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="200">
-                            <ComboBoxItem Content="gemini-2.0-flash-exp" IsSelected="True"/>
-                            <ComboBoxItem Content="gemini-exp-1206"/>
-                            <ComboBoxItem Content="gemini-2.0-flash-thinking-exp-1219"/>
-                            <ComboBoxItem Content="learnlm-1.5-pro-experimental"/>
-                            <ComboBoxItem Content="gemini-1.5-flash"/>
-                            <ComboBoxItem Content="gemini-1.5-flash-8b"/>
-                            <ComboBoxItem Content="gemini-1.5-pro"/>
-                        </ComboBox>
+                        <ComboBox x:Name="GoogleModelComboBox" SelectedValue="{Binding GoogleModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="200" Loaded="GoogleModel_Loaded"/>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="Ollama (LOCAL/FREE)" Margin="0,0,0,10">
+                <!-- Ollama -->
+                <GroupBox Header="Ollama (LOCAL/FREE)" Margin="0,0,0,10" Visibility="{Binding IsOllamaSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel Margin="5">
                         <TextBlock Text="Run AI models locally - Completely free, no API key needed" FontSize="11" Opacity="0.6" Margin="0,0,0,8"/>
                         <TextBlock Text="Ollama Server URL:" Margin="0,0,0,5"/>
@@ -152,18 +138,13 @@
                         </Grid>
                         <TextBlock x:Name="OllamaTestResult" Margin="0,5,0,0" FontSize="11" TextWrapping="Wrap"/>
                         <TextBlock Text="Model:" Margin="0,10,0,5"/>
-                        <ComboBox SelectedValue="{Binding OllamaModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" IsEditable="True" HorizontalAlignment="Left" MinWidth="200">
-                            <ComboBoxItem Content="llama3.2" IsSelected="True"/>
-                            <ComboBoxItem Content="mistral"/>
-                            <ComboBoxItem Content="qwen2.5"/>
-                            <ComboBoxItem Content="phi3"/>
-                            <ComboBoxItem Content="gemma2"/>
-                        </ComboBox>
+                        <ComboBox x:Name="OllamaModelComboBox" SelectedValue="{Binding OllamaModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" IsEditable="True" HorizontalAlignment="Left" MinWidth="200" Loaded="OllamaModel_Loaded"/>
                         <TextBlock Text="Tip: Run 'ollama pull modelname' to download models" FontSize="10" Opacity="0.5" Margin="0,5,0,0"/>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="OpenRouter (FREE + PAID)" Margin="0,0,0,10">
+                <!-- OpenRouter -->
+                <GroupBox Header="OpenRouter (FREE + PAID)" Margin="0,0,0,10" Visibility="{Binding IsOpenRouterSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel Margin="5">
                         <TextBlock Text="Access multiple AI providers through one API - Has free models" FontSize="11" Opacity="0.6" Margin="0,0,0,8"/>
                         <TextBlock Text="OpenRouter API Key:" Margin="0,0,0,5"/>
@@ -179,7 +160,7 @@
                         </Grid>
                         <TextBlock x:Name="OpenRouterTestResult" Margin="0,5,0,0" FontSize="11" TextWrapping="Wrap"/>
                         <TextBlock Text="Model:" Margin="0,10,0,5"/>
-                        <ComboBox SelectedValue="{Binding OpenRouterModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" IsEditable="True" HorizontalAlignment="Left" MinWidth="300">
+                        <ComboBox x:Name="OpenRouterModelComboBox" SelectedValue="{Binding OpenRouterModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" IsEditable="True" HorizontalAlignment="Left" MinWidth="300">
                             <ComboBoxItem Content="meta-llama/llama-3.2-3b-instruct:free" IsSelected="True"/>
                             <ComboBoxItem Content="google/gemma-2-9b-it:free"/>
                             <ComboBoxItem Content="mistralai/mistral-7b-instruct:free"/>
@@ -190,7 +171,8 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="🤖 MCP - NINA Equipment Control (Anthropic Claude)" Margin="0,0,0,10">
+                <!-- MCP Section (only visible for Anthropic) -->
+                <GroupBox Header="🤖 MCP - NINA Equipment Control" Margin="0,0,0,10" Visibility="{Binding IsAnthropicSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel Margin="5">
                         <TextBlock TextWrapping="Wrap" FontSize="11" Opacity="0.6" Margin="0,0,0,8">When using Anthropic Claude, enable MCP (Model Context Protocol) to give AI direct control over your NINA equipment via the Advanced API plugin.</TextBlock>
                         
@@ -226,6 +208,43 @@
                         <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                             <Button Content="Get Advanced API Plugin" Click="GetAdvancedAPIPlugin_Click" MinWidth="140"/>
                             <Button Content="MCP GitHub Repo" Click="GetMCPRepo_Click" Margin="10,0,0,0" MinWidth="120"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- External MCP Server Configuration -->
+                <GroupBox Header="🔧 External MCP Server (Advanced)" Margin="0,0,0,10">
+                    <StackPanel Margin="5">
+                        <TextBlock TextWrapping="Wrap" FontSize="11" Opacity="0.6" Margin="0,0,0,8">
+                            Connect external MCP servers to extend AI capabilities beyond NINA equipment control.
+                            Add custom tools like astronomy calculations, weather APIs, databases, or any Python-based functionality.
+                        </TextBlock>
+                        
+                        <TextBlock Text="Python Executable Path:" Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding ExternalMCPPythonPath, UpdateSourceTrigger=PropertyChanged}" 
+                                 HorizontalAlignment="Left" MinWidth="350" 
+                                 ToolTip="Path to Python executable (e.g., 'python' or 'C:\Python311\python.exe')"/>
+                        
+                        <TextBlock Text="MCP Server Script Path:" Margin="0,10,0,5"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Text="{Binding ExternalMCPScriptPath, UpdateSourceTrigger=PropertyChanged}" 
+                                     Width="350" HorizontalAlignment="Left" 
+                                     ToolTip="Path to your MCP server Python script"/>
+                            <Button Grid.Column="1" Content="Browse" Margin="5,0,0,0" MinWidth="70"/>
+                        </Grid>
+                        
+                        <TextBlock TextWrapping="Wrap" FontSize="10" Opacity="0.5" Margin="0,10,0,0">
+                            <Run Text="Example: nina_advanced_api_mcp_server.py wraps NINA Advanced API as MCP tools."/><LineBreak/>
+                            <Run Text="Create custom servers for astronomy calculations, weather data, catalog queries, etc."/>
+                        </TextBlock>
+                        
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                            <Button Content="Documentation" Click="GetExternalMCPDocs_Click" MinWidth="120"/>
+                            <Button Content="Example Server" Click="GetExternalMCPExample_Click" Margin="10,0,0,0" MinWidth="120"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>

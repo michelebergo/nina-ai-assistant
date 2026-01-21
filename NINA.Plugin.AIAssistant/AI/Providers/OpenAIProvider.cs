@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -129,15 +130,54 @@ namespace NINA.Plugin.AIAssistant.AI
 
         public async Task<string[]> GetAvailableModelsAsync(CancellationToken cancellationToken = default)
         {
-            return await Task.FromResult(new[]
+            try
             {
-                "gpt-4o-mini",
+                if (_httpClient == null || _config == null)
+                    return GetDefaultModels();
+
+                var request = new HttpRequestMessage(HttpMethod.Get, "https://api.openai.com/v1/models");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _config.ApiKey);
+
+                var response = await _httpClient.SendAsync(request, cancellationToken);
+                
+                if (!response.IsSuccessStatusCode)
+                    return GetDefaultModels();
+
+                var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                var jsonResponse = JObject.Parse(responseContent);
+                var models = jsonResponse["data"]?.ToObject<List<JObject>>();
+
+                if (models == null || models.Count == 0)
+                    return GetDefaultModels();
+
+                // Filter to only chat/completion models (exclude embeddings, audio, etc.)
+                var modelIds = models
+                    .Select(m => m["id"]?.ToString())
+                    .Where(id => !string.IsNullOrEmpty(id) && 
+                                (id.StartsWith("gpt") || id.StartsWith("o1") || id.StartsWith("o3")))
+                    .OrderByDescending(id => id) // Latest versions first
+                    .ToArray();
+
+                return modelIds.Length > 0 ? modelIds : GetDefaultModels();
+            }
+            catch (Exception ex)
+            {
+                Logger.Warning($"Failed to fetch OpenAI models: {ex.Message}");
+                return GetDefaultModels();
+            }
+        }
+
+        private string[] GetDefaultModels()
+        {
+            return new[]
+            {
                 "gpt-4o",
+                "gpt-4o-mini",
                 "gpt-4-turbo",
                 "gpt-3.5-turbo",
                 "o1-mini",
                 "o1-preview"
-            });
+            };
         }
     }
 }
