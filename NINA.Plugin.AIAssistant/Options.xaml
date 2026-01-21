@@ -125,9 +125,13 @@
                         <TextBlock x:Name="GoogleTestResult" Margin="0,5,0,0" FontSize="11" TextWrapping="Wrap"/>
                         <TextBlock Text="Model:" Margin="0,10,0,5"/>
                         <ComboBox SelectedValue="{Binding GoogleModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="200">
-                            <ComboBoxItem Content="gemini-1.5-flash" IsSelected="True"/>
+                            <ComboBoxItem Content="gemini-2.0-flash-exp" IsSelected="True"/>
+                            <ComboBoxItem Content="gemini-exp-1206"/>
+                            <ComboBoxItem Content="gemini-2.0-flash-thinking-exp-1219"/>
+                            <ComboBoxItem Content="learnlm-1.5-pro-experimental"/>
+                            <ComboBoxItem Content="gemini-1.5-flash"/>
+                            <ComboBoxItem Content="gemini-1.5-flash-8b"/>
                             <ComboBoxItem Content="gemini-1.5-pro"/>
-                            <ComboBoxItem Content="gemini-2.0-flash-exp"/>
                         </ComboBox>
                     </StackPanel>
                 </GroupBox>

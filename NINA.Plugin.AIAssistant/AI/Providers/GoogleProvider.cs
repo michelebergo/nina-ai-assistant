@@ -52,7 +52,7 @@ namespace NINA.Plugin.AIAssistant.AI
 
             try
             {
-                // Latest: gemini-2.0-flash-exp (fastest, multimodal), gemini-1.5-pro (most capable)
+                // Latest: gemini-2.0-flash-exp (newest, multimodal), gemini-exp-1206 (experimental), gemini-2.0-flash-thinking-exp (reasoning)
                 var modelId = _config.ModelId ?? "gemini-2.0-flash-exp";
                 var systemInstruction = request.SystemPrompt ?? "You are an expert astrophotography assistant for N.I.N.A. (Nighttime Imaging 'N' Astronomy). Help analyze images, suggest optimal settings, and provide intelligent guidance.";
 
@@ -141,9 +141,13 @@ namespace NINA.Plugin.AIAssistant.AI
         {
             return await Task.FromResult(new[]
             {
+                "gemini-2.0-flash-exp",
+                "gemini-exp-1206",
+                "gemini-2.0-flash-thinking-exp-1219",
+                "learnlm-1.5-pro-experimental",
                 "gemini-1.5-flash",
-                "gemini-1.5-pro",
-                "gemini-2.0-flash-exp"
+                "gemini-1.5-flash-8b",
+                "gemini-1.5-pro"
             });
         }
     }

@@ -382,7 +382,8 @@ namespace NINA.Plugin.AIAssistant
                 var json = JsonConvert.SerializeObject(requestBody);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={plugin.GoogleApiKey}";
+                // Use gemini-2.0-flash-exp for testing (latest model)
+                var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={plugin.GoogleApiKey}";
                 var response = await client.PostAsync(url, content);
 
                 if (response.IsSuccessStatusCode)
@@ -392,7 +393,20 @@ namespace NINA.Plugin.AIAssistant
                 else
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
-                    ShowResult(resultTextBlock, $"❌ Invalid API key: {response.StatusCode}", Colors.Salmon);
+                    var errorMsg = $"❌ API Error ({response.StatusCode})";
+                    
+                    try
+                    {
+                        var errorJson = JObject.Parse(responseContent);
+                        var message = errorJson["error"]?["message"]?.ToString();
+                        if (!string.IsNullOrEmpty(message))
+                        {
+                            errorMsg = $"❌ {message}";
+                        }
+                    }
+                    catch { }
+                    
+                    ShowResult(resultTextBlock, errorMsg, Colors.Salmon);
                 }
             }
             catch (Exception ex)
