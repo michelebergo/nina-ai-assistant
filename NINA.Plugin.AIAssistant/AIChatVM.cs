@@ -71,6 +71,7 @@ namespace NINA.Plugin.AIAssistant
             // Initialize commands
             SendMessageCommand = new MvvmAsyncRelayCommand(SendMessageAsync);
             ClearChatCommand = new MvvmRelayCommand(ClearChat);
+            StopResponseCommand = new MvvmRelayCommand(StopResponse);
 
             // Add welcome message
             var mcpEnabled = AIAssistantPlugin.Instance?.MCPEnabled ?? false;
@@ -128,9 +129,11 @@ namespace NINA.Plugin.AIAssistant
 
         public ICommand SendMessageCommand { get; }
         public ICommand ClearChatCommand { get; }
+        public ICommand StopResponseCommand { get; }
 
         private readonly AIService? _aiService;
         private bool _mcpInitialized = false;
+        private CancellationTokenSource? _responseCancellationTokenSource;
 
         private async Task InitializeMCPIfNeeded()
         {
@@ -317,6 +320,11 @@ namespace NINA.Plugin.AIAssistant
             IsProcessing = true;
             StatusMessage = "🤔 Thinking...";
 
+            // Create new cancellation token source for this response
+            _responseCancellationTokenSource?.Cancel();
+            _responseCancellationTokenSource = new CancellationTokenSource();
+            var cancellationToken = _responseCancellationTokenSource.Token;
+
             try
             {
                 // Initialize MCP if needed (for Anthropic with MCP enabled)
@@ -341,7 +349,7 @@ You help users with:
 Keep responses concise but informative. Use technical terms appropriately.";
                 }
 
-                var response = await _aiService.QueryAsync(userMsg, systemPrompt, CancellationToken.None);
+                var response = await _aiService.QueryAsync(userMsg, systemPrompt, cancellationToken);
 
                 Messages.Add(new ChatMessage
                 {
@@ -351,8 +359,18 @@ Keep responses concise but informative. Use technical terms appropriately.";
                 });
 
                 StatusMessage = "✓ Ready";
-            }
-            catch (Exception ex)
+            }            catch (OperationCanceledException)
+            {
+                // User stopped the response
+                Messages.Add(new ChatMessage
+                {
+                    Role = "assistant",
+                    Content = "[Response stopped by user]",
+                    Timestamp = DateTime.Now,
+                    IsError = false
+                });
+                StatusMessage = "Stopped";
+            }            catch (Exception ex)
             {
                 Logger.Error($"AI Query failed: {ex.Message}");
                 Messages.Add(new ChatMessage
@@ -380,6 +398,12 @@ Keep responses concise but informative. Use technical terms appropriately.";
                 Timestamp = DateTime.Now
             });
             StatusMessage = "Ready";
+        }
+
+        private void StopResponse()
+        {
+            _responseCancellationTokenSource?.Cancel();
+            StatusMessage = "Stopping...";
         }
 
         public void Dispose() { }

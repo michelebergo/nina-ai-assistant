@@ -135,12 +135,17 @@ namespace NINA.Plugin.AIAssistant
 
         #region GitHub Token Handlers
 
-        private void GitHubToken_Changed(object sender, RoutedEventArgs e)
+        private async void GitHubToken_Changed(object sender, RoutedEventArgs e)
         {
             var passwordBox = sender as PasswordBox;
             if (passwordBox?.DataContext is AIAssistantPlugin plugin)
             {
                 plugin.GitHubApiKey = passwordBox.Password;
+                // Auto-reload models when API key changes
+                if (!string.IsNullOrWhiteSpace(plugin.GitHubApiKey))
+                {
+                    await LoadModelsForProvider(AIProviderType.GitHub, plugin);
+                }
             }
             ClearTestResult("GitHubTestResult", sender);
         }
@@ -212,12 +217,17 @@ namespace NINA.Plugin.AIAssistant
 
         #region OpenAI Token Handlers
 
-        private void OpenAIToken_Changed(object sender, RoutedEventArgs e)
+        private async void OpenAIToken_Changed(object sender, RoutedEventArgs e)
         {
             var passwordBox = sender as PasswordBox;
             if (passwordBox?.DataContext is AIAssistantPlugin plugin)
             {
                 plugin.OpenAIApiKey = passwordBox.Password;
+                // Auto-reload models when API key changes
+                if (!string.IsNullOrWhiteSpace(plugin.OpenAIApiKey))
+                {
+                    await LoadModelsForProvider(AIProviderType.OpenAI, plugin);
+                }
             }
             ClearTestResult("OpenAITestResult", sender);
         }
@@ -288,12 +298,17 @@ namespace NINA.Plugin.AIAssistant
 
         #region Anthropic Token Handlers
 
-        private void AnthropicToken_Changed(object sender, RoutedEventArgs e)
+        private async void AnthropicToken_Changed(object sender, RoutedEventArgs e)
         {
             var passwordBox = sender as PasswordBox;
             if (passwordBox?.DataContext is AIAssistantPlugin plugin)
             {
                 plugin.AnthropicApiKey = passwordBox.Password;
+                // Auto-reload models when API key changes
+                if (!string.IsNullOrWhiteSpace(plugin.AnthropicApiKey))
+                {
+                    await LoadModelsForProvider(AIProviderType.Anthropic, plugin);
+                }
             }
             ClearTestResult("AnthropicTestResult", sender);
         }
@@ -375,12 +390,17 @@ namespace NINA.Plugin.AIAssistant
 
         #region Google Token Handlers
 
-        private void GoogleToken_Changed(object sender, RoutedEventArgs e)
+        private async void GoogleToken_Changed(object sender, RoutedEventArgs e)
         {
             var passwordBox = sender as PasswordBox;
             if (passwordBox?.DataContext is AIAssistantPlugin plugin)
             {
                 plugin.GoogleApiKey = passwordBox.Password;
+                // Auto-reload models when API key changes
+                if (!string.IsNullOrWhiteSpace(plugin.GoogleApiKey))
+                {
+                    await LoadModelsForProvider(AIProviderType.Google, plugin);
+                }
             }
             ClearTestResult("GoogleTestResult", sender);
         }
