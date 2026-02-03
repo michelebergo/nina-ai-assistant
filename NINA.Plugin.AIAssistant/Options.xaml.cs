@@ -89,7 +89,33 @@ namespace NINA.Plugin.AIAssistant
 
         #endregion
 
-        #region Model ComboBox Loaded Handlers
+        #region Model ComboBox Handlers
+
+        private void ModelCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // When user selects from dropdown, sync the custom textbox
+            if (sender is ComboBox comboBox && comboBox.SelectedItem is ComboBoxItem item)
+            {
+                var modelId = item.Content?.ToString();
+                if (!string.IsNullOrWhiteSpace(modelId))
+                {
+                    // Find corresponding custom textbox and update it
+                    var customBox = comboBox.Name switch
+                    {
+                        "GitHubModelComboBox" => FindControl<TextBox>("GitHubCustomModelBox"),
+                        "OpenAIModelComboBox" => FindControl<TextBox>("OpenAICustomModelBox"),
+                        "AnthropicModelComboBox" => FindControl<TextBox>("AnthropicCustomModelBox"),
+                        "GoogleModelComboBox" => FindControl<TextBox>("GoogleCustomModelBox"),
+                        _ => null
+                    };
+                    
+                    if (customBox != null)
+                    {
+                        customBox.Text = modelId;
+                    }
+                }
+            }
+        }
 
         private async void GitHubModel_Loaded(object sender, RoutedEventArgs e)
         {
@@ -453,8 +479,8 @@ namespace NINA.Plugin.AIAssistant
                 var json = JsonConvert.SerializeObject(requestBody);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                // Use gemini-2.0-flash-exp for testing (latest model)
-                var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={plugin.GoogleApiKey}";
+                // Use gemini-2.0-flash-001 for testing (stable model)
+                var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent?key={plugin.GoogleApiKey}";
                 var response = await client.PostAsync(url, content);
 
                 if (response.IsSuccessStatusCode)

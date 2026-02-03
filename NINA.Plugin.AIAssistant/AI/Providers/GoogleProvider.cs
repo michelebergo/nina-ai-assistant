@@ -124,8 +124,8 @@ namespace NINA.Plugin.AIAssistant.AI
 
         private async Task<AIResponse> SendStandardRequestAsync(AIRequest request, CancellationToken cancellationToken)
         {
-            // Latest: gemini-2.0-flash-exp (newest, multimodal), gemini-exp-1206 (experimental), gemini-2.0-flash-thinking-exp (reasoning)
-            var modelId = _config!.ModelId ?? "gemini-2.0-flash-exp";
+            // Latest: gemini-2.0-flash-001 (stable multimodal), gemini-2.5-pro (most capable)
+            var modelId = _config!.ModelId ?? "gemini-2.0-flash-001";
             var systemInstruction = request.SystemPrompt ?? "You are an expert astrophotography assistant for N.I.N.A. (Nighttime Imaging 'N' Astronomy). Help analyze images, suggest optimal settings, and provide intelligent guidance.";
 
             var requestBody = new
@@ -246,7 +246,7 @@ namespace NINA.Plugin.AIAssistant.AI
                 }
             }).ToList();
 
-            var modelId = _config!.ModelId ?? "gemini-2.0-flash-exp";
+            var modelId = _config!.ModelId ?? "gemini-2.0-flash-001";
             var systemInstruction = request.SystemPrompt ?? GetMCPSystemPrompt();
             Logger.Debug($"GoogleProvider: Using system prompt: {systemInstruction.Substring(0, Math.Min(100, systemInstruction.Length))}...");
             

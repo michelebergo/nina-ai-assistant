@@ -64,14 +64,26 @@ namespace NINA.Plugin.AIAssistant.AI
                     new { role = "user", content = request.Prompt }
                 };
 
-                var requestBody = new
+                var modelId = _config.ModelId ?? "gpt-4o";
+                
+                // GPT-4o and newer models require max_completion_tokens instead of max_tokens
+                var useMaxCompletionTokens = modelId.Contains("gpt-4o") || modelId.Contains("o1") || modelId.Contains("o3");
+                
+                var requestBody = new Dictionary<string, object>
                 {
-                    // Latest models: gpt-4o (flagship), o1/o1-preview (reasoning), gpt-4o-mini (efficient)
-                    model = _config.ModelId ?? "gpt-4o",
-                    messages = messages,
-                    temperature = request.Temperature,
-                    max_tokens = request.MaxTokens
+                    ["model"] = modelId,
+                    ["messages"] = messages,
+                    ["temperature"] = request.Temperature
                 };
+                
+                if (useMaxCompletionTokens)
+                {
+                    requestBody["max_completion_tokens"] = request.MaxTokens;
+                }
+                else
+                {
+                    requestBody["max_tokens"] = request.MaxTokens;
+                }
 
                 var json = JsonConvert.SerializeObject(requestBody);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");

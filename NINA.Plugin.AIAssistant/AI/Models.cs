@@ -125,9 +125,10 @@ namespace NINA.Plugin.AIAssistant.AI
                 },
                 AIProviderType.Google => new List<AIModelInfo>
                 {
-                    new() { Id = "gemini-2.0-flash-exp", DisplayName = "Gemini 2.0 Flash", Provider = provider, IsFree = true, Description = "Latest (default)" },
+                    new() { Id = "gemini-2.0-flash-001", DisplayName = "Gemini 2.0 Flash", Provider = provider, IsFree = true, Description = "Latest stable (default)" },
+                    new() { Id = "gemini-2.5-pro", DisplayName = "Gemini 2.5 Pro", Provider = provider, IsFree = true, Description = "Most capable" },
                     new() { Id = "gemini-1.5-flash", DisplayName = "Gemini 1.5 Flash", Provider = provider, IsFree = true, Description = "Fast, free tier" },
-                    new() { Id = "gemini-1.5-pro", DisplayName = "Gemini 1.5 Pro", Provider = provider, IsFree = true, Description = "More capable" },
+                    new() { Id = "gemini-1.5-pro", DisplayName = "Gemini 1.5 Pro", Provider = provider, IsFree = true, Description = "Previous generation" },
                 },
                 AIProviderType.Ollama => new List<AIModelInfo>
                 {

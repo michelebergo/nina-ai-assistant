@@ -17,6 +17,7 @@
                     <Run Text="• MCP Equipment Control: Natural language control of cameras, mounts, focusers, filter wheels, guiding, platesolving"/><LineBreak/>
                     <Run Text="• Image Analysis: Intelligent feedback on captures, HFR, star detection, and quality assessment"/><LineBreak/>
                     <Run Text="• Dynamic Model Discovery: Automatically fetches latest available AI models from providers"/><LineBreak/>
+                    <Run Text="• Custom Model Support: Enter any model ID manually when new models are released or providers update"/><LineBreak/>
                     <Run Text="• Extensible Architecture: Built-in + external MCP servers for custom tool integration"/>
                 </TextBlock>
 
@@ -54,7 +55,9 @@
                         </Grid>
                         <TextBlock x:Name="GitHubTestResult" Margin="0,5,0,0" FontSize="11" TextWrapping="Wrap"/>
                         <TextBlock Text="Model:" Margin="0,10,0,5"/>
-                        <ComboBox x:Name="GitHubModelComboBox" SelectedValue="{Binding GitHubModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="200" Loaded="GitHubModel_Loaded"/>
+                        <ComboBox x:Name="GitHubModelComboBox" SelectedValue="{Binding GitHubModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="200" Loaded="GitHubModel_Loaded" SelectionChanged="ModelCombo_SelectionChanged"/>
+                        <TextBlock Text="Or enter custom model ID:" Margin="0,10,0,5" FontSize="11" Opacity="0.7"/>
+                        <TextBox x:Name="GitHubCustomModelBox" Text="{Binding GitHubModelId, UpdateSourceTrigger=PropertyChanged}" Width="250" HorizontalAlignment="Left" ToolTip="Enter any model ID (e.g., gpt-4o-mini, Llama-3.3-70B-Instruct)"/>
                     </StackPanel>
                 </GroupBox>
 
@@ -75,7 +78,9 @@
                         </Grid>
                         <TextBlock x:Name="OpenAITestResult" Margin="0,5,0,0" FontSize="11" TextWrapping="Wrap"/>
                         <TextBlock Text="Model:" Margin="0,10,0,5"/>
-                        <ComboBox x:Name="OpenAIModelComboBox" SelectedValue="{Binding OpenAIModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="200" Loaded="OpenAIModel_Loaded"/>
+                        <ComboBox x:Name="OpenAIModelComboBox" SelectedValue="{Binding OpenAIModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="200" Loaded="OpenAIModel_Loaded" SelectionChanged="ModelCombo_SelectionChanged"/>
+                        <TextBlock Text="Or enter custom model ID:" Margin="0,10,0,5" FontSize="11" Opacity="0.7"/>
+                        <TextBox x:Name="OpenAICustomModelBox" Text="{Binding OpenAIModelId, UpdateSourceTrigger=PropertyChanged}" Width="250" HorizontalAlignment="Left" ToolTip="Enter any model ID (e.g., gpt-4o, gpt-4-turbo, o1-preview)"/>
                     </StackPanel>
                 </GroupBox>
 
@@ -96,7 +101,9 @@
                         </Grid>
                         <TextBlock x:Name="AnthropicTestResult" Margin="0,5,0,0" FontSize="11" TextWrapping="Wrap"/>
                         <TextBlock Text="Model:" Margin="0,10,0,5"/>
-                        <ComboBox x:Name="AnthropicModelComboBox" SelectedValue="{Binding AnthropicModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="250" Loaded="AnthropicModel_Loaded"/>
+                        <ComboBox x:Name="AnthropicModelComboBox" SelectedValue="{Binding AnthropicModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="250" Loaded="AnthropicModel_Loaded" SelectionChanged="ModelCombo_SelectionChanged"/>
+                        <TextBlock Text="Or enter custom model ID:" Margin="0,10,0,5" FontSize="11" Opacity="0.7"/>
+                        <TextBox x:Name="AnthropicCustomModelBox" Text="{Binding AnthropicModelId, UpdateSourceTrigger=PropertyChanged}" Width="250" HorizontalAlignment="Left" ToolTip="Enter any model ID (e.g., claude-sonnet-4-20250514, claude-3-7-sonnet-20250219)"/>
                     </StackPanel>
                 </GroupBox>
 
@@ -117,7 +124,9 @@
                         </Grid>
                         <TextBlock x:Name="GoogleTestResult" Margin="0,5,0,0" FontSize="11" TextWrapping="Wrap"/>
                         <TextBlock Text="Model:" Margin="0,10,0,5"/>
-                        <ComboBox x:Name="GoogleModelComboBox" SelectedValue="{Binding GoogleModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="200" Loaded="GoogleModel_Loaded"/>
+                        <ComboBox x:Name="GoogleModelComboBox" SelectedValue="{Binding GoogleModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" HorizontalAlignment="Left" MinWidth="200" Loaded="GoogleModel_Loaded" SelectionChanged="ModelCombo_SelectionChanged"/>
+                        <TextBlock Text="Or enter custom model ID:" Margin="0,10,0,5" FontSize="11" Opacity="0.7"/>
+                        <TextBox x:Name="GoogleCustomModelBox" Text="{Binding GoogleModelId, UpdateSourceTrigger=PropertyChanged}" Width="250" HorizontalAlignment="Left" ToolTip="Enter any model ID (e.g., gemini-2.0-flash-001, gemini-2.5-pro, gemini-1.5-pro)"/>
                     </StackPanel>
                 </GroupBox>
 
