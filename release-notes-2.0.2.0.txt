@@ -1,0 +1,65 @@
+AI Assistant v2.0.2.0 - Custom Models & API Compatibility Updates
+===============================================================
+
+Release Date: February 3, 2026
+Package: NINA.Plugin.AIAssistant.2.0.2.0.zip
+Size: 2,219,397 bytes
+SHA256: 4FCD27F9748F25C94FEE94626EF2DC06F03CEF286B7D590662EB73053289B6D0
+
+🎯 NEW FEATURES
+
+Custom Model ID Support
+- Added text input fields for all providers (GitHub, OpenAI, Anthropic, Google)
+- Users can now manually enter any model ID when providers release new models
+- Future-proof against model deprecations and API changes
+- Examples provided in tooltips for each provider
+- ComboBox syncs with custom textbox for seamless experience
+
+🔧 BUG FIXES & IMPROVEMENTS
+
+Google Gemini API Update
+- Migrated from deprecated gemini-2.0-flash-exp to stable gemini-2.0-flash-001
+- Added gemini-2.5-pro (most capable Google model) to available models
+- Updated all default model references throughout codebase
+- Fixed "model not found" errors for Gemini users
+
+OpenAI API Compatibility
+- Fixed max_tokens parameter for GPT-4o and newer models
+- GPT-4o, o1, and o3 models now use max_completion_tokens instead of max_tokens
+- Older models (GPT-4 Turbo, GPT-3.5) continue using max_tokens
+- Eliminates "Unsupported parameter" errors
+
+Visual Updates
+- New plugin icon with updated design
+- Icon now properly included in build output and deployment
+
+📦 INSTALLATION
+
+1. Download NINA.Plugin.AIAssistant.2.0.2.0.zip
+2. Extract to %localappdata%\NINA\Plugins\3.0.0\AI Assistant\
+3. Restart NINA
+4. Configure your preferred AI provider in Options > Plugins > AI Assistant
+
+💡 USAGE TIPS
+
+Using Custom Model IDs:
+- Select from dropdown for known models
+- Or type directly in "custom model ID" field below dropdown
+- Examples: gpt-4o-mini, claude-sonnet-4-20250514, gemini-2.0-flash-001
+- Useful when providers release new beta/experimental models
+
+Compatible with:
+- NINA 3.0.0.0 or later
+- Advanced API plugin (required for MCP equipment control)
+- .NET 8.0 Runtime
+
+🔗 LINKS
+
+GitHub Repository: https://github.com/michelebergo/nina-ai-assistant
+Documentation: https://github.com/michelebergo/nina-ai-assistant/blob/main/README.md
+Issue Tracker: https://github.com/michelebergo/nina-ai-assistant/issues
+License: MIT
+
+🙏 ACKNOWLEDGMENTS
+
+Thanks to the NINA community for feedback on model compatibility issues!

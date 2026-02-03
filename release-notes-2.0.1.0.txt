@@ -1,0 +1,21 @@
+##  Version 2.0.1.0 - UX Improvements
+
+###  New Features
+- **Stop Button**: Added ability to cancel AI responses mid-generation with a new stop button ( Stop) that appears during processing
+- **Auto-Scroll**: Chat automatically scrolls to show new AI responses as they arrive
+
+###  Improvements  
+- **Auto-Reload Models**: No more NINA restarts needed! Models automatically populate when you paste an API key
+- **Title Fix**: Chat panel now properly displays "AI Assistant" (proper capitalization)
+
+###  Installation
+Download and install via NINA Plugin Manager, or manually download the ZIP and extract to your NINA plugins folder.
+
+###  What's Changed
+- Auto-reload models when API keys are entered (GitHub, OpenAI, Anthropic, Google)
+- Fixed chat panel title capitalization
+- Added smart auto-scrolling with manual override
+- Implemented cancellation token support for stopping AI mid-response
+- Added StopResponseCommand with UI visibility binding
+
+**Full Changelog**: https://github.com/michelebergo/nina-ai-assistant/compare/v2.0.0.0...v2.0.1.0
