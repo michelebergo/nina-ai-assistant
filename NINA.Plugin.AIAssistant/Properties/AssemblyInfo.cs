@@ -18,8 +18,8 @@ using System.Runtime.InteropServices;
 [assembly: Guid("af5e2826-e3b4-4b9c-9a1a-1e8d7c8b6a9e")]
 
 // Version information
-[assembly: AssemblyVersion("2.0.2.0")]
-[assembly: AssemblyFileVersion("2.0.2.0")]
+[assembly: AssemblyVersion("2.1.0.0")]
+[assembly: AssemblyFileVersion("2.1.0.0")]
 
 // Plugin metadata
 [assembly: AssemblyMetadata("MinimumApplicationVersion", "3.0.0.0")]
@@ -39,13 +39,12 @@ using System.Runtime.InteropServices;
 • Sequence Optimization: 'Plan 4-hour session on Horsehead' - AI suggests optimal filter rotation, dither patterns, exposure times
 • Weather-Aware Planning: Integrate weather data to adjust sequences, recommend targets, predict session success
 
-🤖 6 AI PROVIDERS (Free to Advanced):
+🤖 5 AI PROVIDERS (Free to Advanced):
 • GitHub Models (FREE) - No credit card, great for learning
 • OpenAI GPT-4o/o1 - Most capable reasoning for complex planning
 • Anthropic Claude Sonnet 4.5 - Best for equipment control via MCP
-• Google Gemini 2.0 - Fast responses, excellent for quick questions
+• Google Gemini 2.0 - Fast responses, MCP equipment control support
 • Ollama (Local) - Privacy-focused, works offline, no API costs
-• OpenRouter - Access multiple providers, some free models
 Dynamic model discovery ensures you always have latest AI capabilities.
 
 🎛️ NATURAL LANGUAGE EQUIPMENT CONTROL (via MCP):

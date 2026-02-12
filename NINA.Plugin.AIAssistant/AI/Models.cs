@@ -30,12 +30,7 @@ namespace NINA.Plugin.AIAssistant.AI
         /// <summary>
         /// Ollama - Local models, completely free
         /// </summary>
-        Ollama,
-
-        /// <summary>
-        /// OpenRouter - Aggregator with free and paid models
-        /// </summary>
-        OpenRouter
+        Ollama
     }
 
     /// <summary>
@@ -88,7 +83,9 @@ namespace NINA.Plugin.AIAssistant.AI
     }
 
     /// <summary>
-    /// Static list of available models per provider
+    /// Static fallback list of models per provider. The Options page fetches live models
+    /// from each provider's API via GetAvailableModelsAsync(). These lists are only used
+    /// as initial defaults before the API is queried.
     /// </summary>
     public static class AvailableModels
     {
@@ -116,12 +113,12 @@ namespace NINA.Plugin.AIAssistant.AI
                 },
                 AIProviderType.Anthropic => new List<AIModelInfo>
                 {
-                    new() { Id = "claude-sonnet-4.5", DisplayName = "Claude Sonnet 4.5", Provider = provider, IsFree = false, Description = "Superior, latest (default)" },
+                    new() { Id = "claude-sonnet-4-5-20250929", DisplayName = "Claude Sonnet 4.5", Provider = provider, IsFree = false, Description = "Latest Sonnet (default)" },
+                    new() { Id = "claude-opus-4-6", DisplayName = "Claude Opus 4.6", Provider = provider, IsFree = false, Description = "Most capable, Feb 2026" },
+                    new() { Id = "claude-opus-4-5-20251101", DisplayName = "Claude Opus 4.5", Provider = provider, IsFree = false, Description = "Flagship, Nov 2025" },
+                    new() { Id = "claude-haiku-4-5-20251001", DisplayName = "Claude Haiku 4.5", Provider = provider, IsFree = false, Description = "Fast, Oct 2025" },
                     new() { Id = "claude-sonnet-4-20250514", DisplayName = "Claude Sonnet 4", Provider = provider, IsFree = false, Description = "May 2025 release" },
-                    new() { Id = "claude-3-7-sonnet-20250219", DisplayName = "Claude 3.7 Sonnet", Provider = provider, IsFree = false, Description = "Advanced Feb 2025" },
-                    new() { Id = "claude-3-5-sonnet-20241022", DisplayName = "Claude 3.5 Sonnet", Provider = provider, IsFree = false, Description = "Best balance" },
-                    new() { Id = "claude-3-5-haiku-20241022", DisplayName = "Claude 3.5 Haiku", Provider = provider, IsFree = false, Description = "Fast, cheap" },
-                    new() { Id = "claude-3-opus-20240229", DisplayName = "Claude 3 Opus", Provider = provider, IsFree = false, Description = "Legacy flagship" },
+                    new() { Id = "claude-3-5-haiku-20241022", DisplayName = "Claude Haiku 3.5", Provider = provider, IsFree = false, Description = "Fast, cheap" },
                 },
                 AIProviderType.Google => new List<AIModelInfo>
                 {
@@ -138,14 +135,6 @@ namespace NINA.Plugin.AIAssistant.AI
                     new() { Id = "phi3", DisplayName = "Phi-3", Provider = provider, IsFree = true, Description = "Microsoft, small" },
                     new() { Id = "gemma2", DisplayName = "Gemma 2", Provider = provider, IsFree = true, Description = "Google, local" },
                 },
-                AIProviderType.OpenRouter => new List<AIModelInfo>
-                {
-                    new() { Id = "meta-llama/llama-3.2-3b-instruct:free", DisplayName = "Llama 3.2 3B (Free)", Provider = provider, IsFree = true },
-                    new() { Id = "google/gemma-2-9b-it:free", DisplayName = "Gemma 2 9B (Free)", Provider = provider, IsFree = true },
-                    new() { Id = "mistralai/mistral-7b-instruct:free", DisplayName = "Mistral 7B (Free)", Provider = provider, IsFree = true },
-                    new() { Id = "openai/gpt-4o-mini", DisplayName = "GPT-4o Mini", Provider = provider, IsFree = false },
-                    new() { Id = "anthropic/claude-3.5-sonnet", DisplayName = "Claude 3.5 Sonnet", Provider = provider, IsFree = false },
-                },
                 _ => new List<AIModelInfo>()
             };
         }
@@ -158,8 +147,7 @@ namespace NINA.Plugin.AIAssistant.AI
                 AIProviderType.OpenAI,
                 AIProviderType.Anthropic,
                 AIProviderType.Google,
-                AIProviderType.Ollama,
-                AIProviderType.OpenRouter
+                AIProviderType.Ollama
             };
         }
 
@@ -172,7 +160,6 @@ namespace NINA.Plugin.AIAssistant.AI
                 AIProviderType.Anthropic => "Anthropic Claude (Paid)",
                 AIProviderType.Google => "Google Gemini (Free tier)",
                 AIProviderType.Ollama => "Ollama (Local/Free)",
-                AIProviderType.OpenRouter => "OpenRouter (Mixed)",
                 _ => provider.ToString()
             };
         }

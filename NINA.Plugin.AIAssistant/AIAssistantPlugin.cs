@@ -37,7 +37,7 @@ namespace NINA.Plugin.AIAssistant
                     RaisePropertyChanged(nameof(IsAnthropicSelected));
                     RaisePropertyChanged(nameof(IsGoogleSelected));
                     RaisePropertyChanged(nameof(IsOllamaSelected));
-                    RaisePropertyChanged(nameof(IsOpenRouterSelected));
+                    RaisePropertyChanged(nameof(IsMCPProviderSelected));
                 }
             }
         }
@@ -47,7 +47,7 @@ namespace NINA.Plugin.AIAssistant
         public bool IsAnthropicSelected => SelectedProviderInternal == AIProviderType.Anthropic;
         public bool IsGoogleSelected => SelectedProviderInternal == AIProviderType.Google;
         public bool IsOllamaSelected => SelectedProviderInternal == AIProviderType.Ollama;
-        public bool IsOpenRouterSelected => SelectedProviderInternal == AIProviderType.OpenRouter;
+        public bool IsMCPProviderSelected => SelectedProviderInternal == AIProviderType.Anthropic || SelectedProviderInternal == AIProviderType.Google;
 
         [ImportingConstructor]
         public AIAssistantPlugin(IProfileService profileService, 
@@ -124,7 +124,7 @@ namespace NINA.Plugin.AIAssistant
                 {
                     Provider = AIProviderType.Anthropic,
                     ApiKey = AnthropicApiKey,
-                    ModelId = AnthropicModelId ?? "claude-sonnet-4.5"
+                    ModelId = AnthropicModelId ?? "claude-sonnet-4-5-20250929"
                 },
                 AIProviderType.Google => new AIProviderConfig
                 {
@@ -137,12 +137,6 @@ namespace NINA.Plugin.AIAssistant
                     Provider = AIProviderType.Ollama,
                     Endpoint = OllamaEndpoint ?? "http://localhost:11434",
                     ModelId = OllamaModelId ?? "llama3.2"
-                },
-                AIProviderType.OpenRouter => new AIProviderConfig
-                {
-                    Provider = AIProviderType.OpenRouter,
-                    ApiKey = OpenRouterApiKey,
-                    ModelId = OpenRouterModelId ?? "meta-llama/llama-3.2-3b-instruct:free"
                 },
                 _ => null
             };
@@ -325,34 +319,6 @@ namespace NINA.Plugin.AIAssistant
             set
             {
                 Settings.Default.OllamaModelId = SanitizeModelId(value);
-                CoreUtil.SaveSettings(Settings.Default);
-                RaisePropertyChanged();
-            }
-        }
-
-        #endregion
-
-        #region OpenRouter Settings
-
-        public string? OpenRouterApiKey
-        {
-            get => Settings.Default.OpenRouterApiKey;
-            set
-            {
-                Settings.Default.OpenRouterApiKey = value;
-                CoreUtil.SaveSettings(Settings.Default);
-                RaisePropertyChanged();
-                if (SelectedProvider == AIProviderType.OpenRouter)
-                    _ = InitializeAIProviderAsync();
-            }
-        }
-
-        public string? OpenRouterModelId
-        {
-            get => SanitizeModelId(Settings.Default.OpenRouterModelId ?? "meta-llama/llama-3.2-3b-instruct:free");
-            set
-            {
-                Settings.Default.OpenRouterModelId = SanitizeModelId(value);
                 CoreUtil.SaveSettings(Settings.Default);
                 RaisePropertyChanged();
             }

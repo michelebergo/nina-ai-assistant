@@ -1,0 +1,34 @@
+N.I.N.A. AI Assistant Plugin v2.1.0.0 - Release Notes
+=====================================================
+
+🌐 Google Gemini MCP Support
+- Google Gemini now supports MCP (Model Context Protocol) for direct equipment control
+- Two MCP-capable providers: Anthropic Claude + Google Gemini
+- MCP settings UI now visible for both providers
+
+🧠 Anti-hallucination System Prompts
+- All 5 providers have comprehensive system prompts
+- Strict rules to prevent fabrication of equipment specs, NINA features, or astrophotography data
+- Scope-limited to astrophotography assistance
+
+🔄 Dynamic Model Discovery
+- All providers fetch available models from APIs with 1-hour cache
+- No more hardcoded, outdated model lists
+
+⚙️ OpenAI Reasoning Model Support
+- Smart max_completion_tokens and temperature handling for o1/o3/o4-mini/GPT-4.1/GPT-5
+- Auto-retry fallback when parameters are rejected
+
+🐛 Bug Fixes
+- Fixed GitHub Models ignoring system prompt (used hardcoded message)
+- Fixed Google+MCP prompt routing (was getting generic prompt, preventing tool calls)
+- Fixed MCP settings UI hidden for Google (only showed for Anthropic)
+- Fixed Anthropic model ID errors with proper versioned IDs
+- Fixed OpenAI temperature rejection for reasoning models
+- Non-chat models filtered from OpenAI and GitHub Models lists
+
+❌ Removed
+- OpenRouter provider completely removed
+
+Supported Providers: Anthropic Claude, OpenAI, Google Gemini, GitHub Models, Ollama
+Requires: N.I.N.A. 3.0.0+

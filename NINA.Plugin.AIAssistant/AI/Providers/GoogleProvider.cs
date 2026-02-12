@@ -126,7 +126,7 @@ namespace NINA.Plugin.AIAssistant.AI
         {
             // Latest: gemini-2.0-flash-001 (stable multimodal), gemini-2.5-pro (most capable)
             var modelId = _config!.ModelId ?? "gemini-2.0-flash-001";
-            var systemInstruction = request.SystemPrompt ?? "You are an expert astrophotography assistant for N.I.N.A. (Nighttime Imaging 'N' Astronomy). Help analyze images, suggest optimal settings, and provide intelligent guidance.";
+            var systemInstruction = request.SystemPrompt ?? "You are an expert astrophotography assistant for N.I.N.A. (Nighttime Imaging 'N' Astronomy). Only answer astrophotography and astronomy questions. Never fabricate equipment specs or N.I.N.A. features. If unsure, say so.";
 
             var requestBody = new
             {
@@ -539,7 +539,13 @@ For example, if user says 'check equipment' or 'show status', USE nina_get_statu
                     })
                     .Select(m => m["name"]?.ToString()?.Replace("models/", ""))
                     .Where(id => !string.IsNullOrEmpty(id))
-                    .OrderByDescending(id => id.Contains("2.0") ? 2 : id.Contains("1.5") ? 1 : 0) // Prefer 2.0 > 1.5
+                    .OrderByDescending(id => 
+                    {
+                        if (id!.Contains("2.5")) return 3;
+                        if (id.Contains("2.0")) return 2;
+                        if (id.Contains("1.5")) return 1;
+                        return 0;
+                    })
                     .ToArray();
 
                 return modelIds.Length > 0 ? modelIds! : GetDefaultModels();
@@ -555,12 +561,10 @@ For example, if user says 'check equipment' or 'show status', USE nina_get_statu
         {
             return new[]
             {
-                "gemini-2.0-flash-exp",
-                "gemini-exp-1206",
-                "gemini-2.0-flash-thinking-exp-1219",
-                "learnlm-1.5-pro-experimental",
+                "gemini-2.0-flash-001",
+                "gemini-2.5-pro",
+                "gemini-2.5-flash",
                 "gemini-1.5-flash",
-                "gemini-1.5-flash-8b",
                 "gemini-1.5-pro"
             };
         }

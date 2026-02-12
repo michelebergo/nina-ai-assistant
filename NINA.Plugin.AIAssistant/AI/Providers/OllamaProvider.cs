@@ -54,7 +54,7 @@ namespace NINA.Plugin.AIAssistant.AI
             {
                 var endpoint = _config.Endpoint ?? "http://localhost:11434";
                 var modelId = _config.ModelId ?? "llama3.2";
-                var systemPrompt = request.SystemPrompt ?? "You are an expert astrophotography assistant for N.I.N.A. (Nighttime Imaging 'N' Astronomy). Help analyze images, suggest optimal settings, and provide intelligent guidance.";
+                var systemPrompt = request.SystemPrompt ?? "You are an expert astrophotography assistant for N.I.N.A. (Nighttime Imaging 'N' Astronomy). Only answer astrophotography and astronomy questions. Never fabricate equipment specs or N.I.N.A. features. If unsure, say so.";
 
                 var requestBody = new
                 {

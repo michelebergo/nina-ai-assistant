@@ -77,11 +77,11 @@ namespace NINA.Plugin.AIAssistant
             {
                 AIProviderType.Anthropic when plugin.MCPEnabled => "✓ MCP-enabled for NINA control",
                 AIProviderType.Anthropic => "Claude AI (enable MCP for equipment control)",
+                AIProviderType.Google when plugin.MCPEnabled => "✓ MCP-enabled for NINA control",
+                AIProviderType.Google => "Google Gemini (enable MCP for equipment control)",
                 AIProviderType.GitHub => "Using GitHub-hosted models",
                 AIProviderType.OpenAI => "Using OpenAI API",
-                AIProviderType.Google => "Using Google Gemini",
                 AIProviderType.Ollama => "Local AI models",
-                AIProviderType.OpenRouter => "Multiple providers via OpenRouter",
                 _ => ""
             };
             statusText.Text = status;
@@ -565,81 +565,6 @@ namespace NINA.Plugin.AIAssistant
             catch (HttpRequestException)
             {
                 ShowResult(resultTextBlock, "❌ Cannot connect. Make sure Ollama is running.", Colors.Salmon);
-            }
-            catch (Exception ex)
-            {
-                HandleApiError(resultTextBlock, ex);
-            }
-            finally
-            {
-                button.IsEnabled = true;
-            }
-        }
-
-        #endregion
-
-        #region OpenRouter Token Handlers
-
-        private void OpenRouterToken_Changed(object sender, RoutedEventArgs e)
-        {
-            var passwordBox = sender as PasswordBox;
-            if (passwordBox?.DataContext is AIAssistantPlugin plugin)
-            {
-                plugin.OpenRouterApiKey = passwordBox.Password;
-            }
-            ClearTestResult("OpenRouterTestResult", sender);
-        }
-
-        private void OpenRouterToken_Loaded(object sender, RoutedEventArgs e)
-        {
-            var passwordBox = sender as PasswordBox;
-            if (passwordBox?.DataContext is AIAssistantPlugin plugin && !string.IsNullOrEmpty(plugin.OpenRouterApiKey))
-            {
-                passwordBox.Password = plugin.OpenRouterApiKey;
-            }
-        }
-
-        private void GetOpenRouterKey_Click(object sender, RoutedEventArgs e)
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = "https://openrouter.ai/keys",
-                UseShellExecute = true
-            });
-        }
-
-        private async void TestOpenRouterKey_Click(object sender, RoutedEventArgs e)
-        {
-            var button = sender as Button;
-            if (button?.DataContext is not AIAssistantPlugin plugin) return;
-
-            var resultTextBlock = FindTextBlock("OpenRouterTestResult", button);
-            if (resultTextBlock == null) return;
-
-            if (string.IsNullOrWhiteSpace(plugin.OpenRouterApiKey))
-            {
-                ShowResult(resultTextBlock, "⚠️ Please enter an API key first", Colors.Orange);
-                return;
-            }
-
-            button.IsEnabled = false;
-            ShowResult(resultTextBlock, "🔄 Testing API key...", Colors.White);
-
-            try
-            {
-                using var client = new HttpClient();
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", plugin.OpenRouterApiKey);
-                
-                var response = await client.GetAsync("https://openrouter.ai/api/v1/auth/key");
-                
-                if (response.IsSuccessStatusCode)
-                {
-                    ShowResult(resultTextBlock, "✅ OpenRouter API key is valid!", Colors.LightGreen);
-                }
-                else
-                {
-                    ShowResult(resultTextBlock, $"❌ Invalid API key: {response.StatusCode}", Colors.Salmon);
-                }
             }
             catch (Exception ex)
             {

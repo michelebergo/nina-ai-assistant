@@ -289,7 +289,6 @@ namespace NINA.Plugin.AIAssistant
                 AIProviderType.OpenAI => !string.IsNullOrEmpty(plugin.OpenAIApiKey),
                 AIProviderType.Anthropic => !string.IsNullOrEmpty(plugin.AnthropicApiKey),
                 AIProviderType.Google => !string.IsNullOrEmpty(plugin.GoogleApiKey),
-                AIProviderType.OpenRouter => !string.IsNullOrEmpty(plugin.OpenRouterApiKey),
                 AIProviderType.Ollama => true, // Ollama doesn't need API key
                 _ => false
             };
@@ -334,19 +333,32 @@ namespace NINA.Plugin.AIAssistant
                 string? systemPrompt = null; // Let the provider use its own system prompt for MCP
                 
                 var mcpEnabled = plugin.MCPEnabled;
-                var isAnthropic = _aiService?.ActiveProviderType == AIProviderType.Anthropic;
+                var isMCPProvider = _aiService?.ActiveProviderType == AIProviderType.Anthropic || 
+                                    _aiService?.ActiveProviderType == AIProviderType.Google;
                 
-                // Only use generic system prompt if MCP is NOT enabled (let AnthropicProvider use its MCP prompt)
-                if (!mcpEnabled || !isAnthropic)
+                // Let MCP-capable providers (Anthropic, Google) use their own MCP system prompt
+                if (!mcpEnabled || !isMCPProvider)
                 {
-                    systemPrompt = @"You are an expert astrophotography assistant integrated into N.I.N.A. (Nighttime Imaging 'N' Astronomy) software. 
-You help users with:
-- Equipment setup and optimization (cameras, telescopes, mounts, filters)
-- Imaging session planning (targets, exposure times, filter sequences)
-- Image acquisition troubleshooting
-- Processing workflows and techniques
-- Weather and seeing conditions
-Keep responses concise but informative. Use technical terms appropriately.";
+                    systemPrompt = @"You are an expert astrophotography assistant integrated into N.I.N.A. (Nighttime Imaging 'N' Astronomy) software version 3.x.
+
+IMPORTANT RULES:
+- Only answer questions related to astrophotography, astronomy, N.I.N.A. software, and imaging equipment.
+- If you don't know something, say so. NEVER fabricate equipment specs, camera sensor data, or telescope specifications.
+- Do NOT invent features or settings that don't exist in N.I.N.A.
+- When discussing specific equipment, only state facts you are certain about.
+
+Your expertise includes:
+- Camera setup: gain, offset, cooling, binning, ROI for ZWO, QHY, Atik, and other astro cameras
+- Mount control: alignment, tracking, meridian flips, park/unpark, goto for EQ and Alt-Az mounts
+- Focuser operations: autofocus routines, HFR analysis, temperature compensation, Bahtinov mask focusing
+- Filter wheels: LRGB, narrowband (Ha, OIII, SII) filter selection and sequencing
+- Guiding: PHD2 integration, guide star selection, calibration, dithering strategies
+- Platesolving: blind and near solves, center/rotate accuracy, Astap/ANSVR/PlateSolve2
+- Imaging session planning: target selection, exposure times, filter sequences, mosaic planning
+- Image quality: HFR interpretation, star shapes, trailing, vignetting, amp glow, walking noise
+- Flat, dark, bias frame acquisition and calibration strategies
+
+Keep responses concise but accurate. Use proper astrophotography terminology.";
                 }
 
                 var response = await _aiService.QueryAsync(userMsg, systemPrompt, cancellationToken);
@@ -373,14 +385,34 @@ Keep responses concise but informative. Use technical terms appropriately.";
             }            catch (Exception ex)
             {
                 Logger.Error($"AI Query failed: {ex.Message}");
+                var errorMsg = ex.Message;
+                string statusMsg;
+                
+                if (errorMsg.Contains("Model not found"))
+                {
+                    statusMsg = "⚠️ Error - model not found";
+                }
+                else if (errorMsg.Contains("authentication") || errorMsg.Contains("Invalid API key") || errorMsg.Contains("Unauthorized"))
+                {
+                    statusMsg = "⚠️ Error - check your API token";
+                }
+                else if (errorMsg.Contains("Rate limit") || errorMsg.Contains("rate_limit"))
+                {
+                    statusMsg = "⚠️ Rate limited - try again shortly";
+                }
+                else
+                {
+                    statusMsg = "⚠️ Error - see message for details";
+                }
+                
                 Messages.Add(new ChatMessage
                 {
                     Role = "assistant",
-                    Content = $"Sorry, I encountered an error: {ex.Message}\n\nPlease check your API token and try again.",
+                    Content = $"Sorry, I encountered an error: {errorMsg}",
                     Timestamp = DateTime.Now,
                     IsError = true
                 });
-                StatusMessage = "⚠️ Error - check your API token";
+                StatusMessage = statusMsg;
             }
             finally
             {

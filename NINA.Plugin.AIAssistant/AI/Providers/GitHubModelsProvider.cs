@@ -63,9 +63,10 @@ namespace NINA.Plugin.AIAssistant.AI
 
             try
             {
+                var systemPrompt = request.SystemPrompt ?? "You are an expert astrophotography assistant for N.I.N.A. (Nighttime Imaging 'N' Astronomy). Only answer astrophotography and astronomy questions. Never fabricate equipment specs or N.I.N.A. features. If unsure, say so.";
                 var messages = new ChatRequestMessage[]
                 {
-                    new ChatRequestSystemMessage("You are an expert astrophotography assistant for N.I.N.A. (Nighttime Imaging 'N' Astronomy). Help analyze images, suggest optimal settings, and provide intelligent guidance."),
+                    new ChatRequestSystemMessage(systemPrompt),
                     new ChatRequestUserMessage(request.Prompt)
                 };
 
@@ -151,9 +152,14 @@ namespace NINA.Plugin.AIAssistant.AI
                 if (models == null || models.Count == 0)
                     return GetDefaultModels();
 
+                // Filter to chat-capable models only (exclude embeddings, image, audio, etc.)
+                var excludePatterns = new[] { "embed", "whisper", "dall-e", "tts", "jais",
+                                              "cohere-command-r", "ai21" };
+                
                 var modelIds = models
                     .Select(m => m["id"]?.ToString())
-                    .Where(id => !string.IsNullOrEmpty(id))
+                    .Where(id => !string.IsNullOrEmpty(id) &&
+                                !excludePatterns.Any(p => id!.Contains(p, StringComparison.OrdinalIgnoreCase)))
                     .OrderBy(id => id)
                     .ToArray();
 

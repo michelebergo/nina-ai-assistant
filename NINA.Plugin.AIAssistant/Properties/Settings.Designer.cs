@@ -103,7 +103,7 @@ namespace NINA.Plugin.AIAssistant.Properties {
 
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("claude-sonnet-4.5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("claude-sonnet-4-5-20250929")]
         public string AnthropicModelId {
             get {
                 return ((string)(this["AnthropicModelId"]));
@@ -160,31 +160,6 @@ namespace NINA.Plugin.AIAssistant.Properties {
             }
             set {
                 this["OllamaModelId"] = value;
-            }
-        }
-
-        // OpenRouter Settings
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string OpenRouterApiKey {
-            get {
-                return ((string)(this["OpenRouterApiKey"]));
-            }
-            set {
-                this["OpenRouterApiKey"] = value;
-            }
-        }
-
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("meta-llama/llama-3.2-3b-instruct:free")]
-        public string OpenRouterModelId {
-            get {
-                return ((string)(this["OpenRouterModelId"]));
-            }
-            set {
-                this["OpenRouterModelId"] = value;
             }
         }
 

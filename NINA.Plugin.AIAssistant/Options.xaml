@@ -13,7 +13,7 @@
                 <TextBlock Text="AI Assistant Configuration" FontSize="18" FontWeight="Bold" Margin="0,0,0,5"/>
                 <TextBlock TextWrapping="Wrap" Margin="0,0,0,15" FontSize="12" Opacity="0.7">
                     <Run Text="Intelligent AI-powered assistant for NINA with advanced capabilities:"/><LineBreak/>
-                    <Run Text="• Multiple AI Providers: GitHub Models (free), OpenAI, Anthropic Claude, Google Gemini, Ollama (local), OpenRouter"/><LineBreak/>
+                    <Run Text="• Multiple AI Providers: GitHub Models (free), OpenAI, Anthropic Claude, Google Gemini, Ollama (local)"/><LineBreak/>
                     <Run Text="• MCP Equipment Control: Natural language control of cameras, mounts, focusers, filter wheels, guiding, platesolving"/><LineBreak/>
                     <Run Text="• Image Analysis: Intelligent feedback on captures, HFR, star detection, and quality assessment"/><LineBreak/>
                     <Run Text="• Dynamic Model Discovery: Automatically fetches latest available AI models from providers"/><LineBreak/>
@@ -32,7 +32,6 @@
                             <ComboBoxItem Content="Anthropic Claude (MCP)" Tag="Anthropic"/>
                             <ComboBoxItem Content="Google Gemini (FREE)" Tag="Google"/>
                             <ComboBoxItem Content="Ollama (LOCAL)" Tag="Ollama"/>
-                            <ComboBoxItem Content="OpenRouter" Tag="OpenRouter"/>
                         </ComboBox>
                         <TextBlock x:Name="ProviderStatusText" Margin="0,5,0,0" FontSize="11" Opacity="0.7"/>
                     </StackPanel>
@@ -152,38 +151,10 @@
                     </StackPanel>
                 </GroupBox>
 
-                <!-- OpenRouter -->
-                <GroupBox Header="OpenRouter (FREE + PAID)" Margin="0,0,0,10" Visibility="{Binding IsOpenRouterSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <!-- MCP Section (visible for Anthropic and Google) -->
+                <GroupBox Header="🤖 MCP - NINA Equipment Control" Margin="0,0,0,10" Visibility="{Binding IsMCPProviderSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <StackPanel Margin="5">
-                        <TextBlock Text="Access multiple AI providers through one API - Has free models" FontSize="11" Opacity="0.6" Margin="0,0,0,8"/>
-                        <TextBlock Text="OpenRouter API Key:" Margin="0,0,0,5"/>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <PasswordBox x:Name="OpenRouterTokenBox" Width="350" HorizontalAlignment="Left" Margin="0" Loaded="OpenRouterToken_Loaded" PasswordChanged="OpenRouterToken_Changed"/>
-                            <Button Grid.Column="1" Content="Test" Click="TestOpenRouterKey_Click" Margin="3,0,0,0" MinWidth="50" HorizontalAlignment="Left"/>
-                            <Button Grid.Column="2" Content="Get Key" Click="GetOpenRouterKey_Click" Margin="3,0,0,0" MinWidth="70" HorizontalAlignment="Left"/>
-                        </Grid>
-                        <TextBlock x:Name="OpenRouterTestResult" Margin="0,5,0,0" FontSize="11" TextWrapping="Wrap"/>
-                        <TextBlock Text="Model:" Margin="0,10,0,5"/>
-                        <ComboBox x:Name="OpenRouterModelComboBox" SelectedValue="{Binding OpenRouterModelId, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Content" IsEditable="True" HorizontalAlignment="Left" MinWidth="300">
-                            <ComboBoxItem Content="meta-llama/llama-3.2-3b-instruct:free" IsSelected="True"/>
-                            <ComboBoxItem Content="google/gemma-2-9b-it:free"/>
-                            <ComboBoxItem Content="mistralai/mistral-7b-instruct:free"/>
-                            <ComboBoxItem Content="openai/gpt-4o-mini"/>
-                            <ComboBoxItem Content="anthropic/claude-3.5-sonnet"/>
-                        </ComboBox>
-                        <TextBlock Text="Models ending in ':free' are completely free to use" FontSize="10" Opacity="0.5" Margin="0,5,0,0"/>
-                    </StackPanel>
-                </GroupBox>
-
-                <!-- MCP Section (only visible for Anthropic) -->
-                <GroupBox Header="🤖 MCP - NINA Equipment Control" Margin="0,0,0,10" Visibility="{Binding IsAnthropicSelected, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    <StackPanel Margin="5">
-                        <TextBlock TextWrapping="Wrap" FontSize="11" Opacity="0.6" Margin="0,0,0,8">When using Anthropic Claude, enable MCP (Model Context Protocol) to give AI direct control over your NINA equipment via the Advanced API plugin.</TextBlock>
+                        <TextBlock TextWrapping="Wrap" FontSize="11" Opacity="0.6" Margin="0,0,0,8">When using Anthropic Claude or Google Gemini, enable MCP (Model Context Protocol) to give AI direct control over your NINA equipment via the Advanced API plugin.</TextBlock>
                         
                         <CheckBox Content="Enable MCP for Equipment Control" IsChecked="{Binding MCPEnabled, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10"/>
                         
@@ -212,7 +183,7 @@
                         
                         <TextBlock x:Name="MCPTestResult" Margin="0,5,0,0" FontSize="11" TextWrapping="Wrap"/>
                         
-                        <TextBlock TextWrapping="Wrap" FontSize="10" Opacity="0.5" Margin="0,10,0,0">With MCP enabled, you can ask Claude to: "Connect all equipment", "Take a 30s exposure of M31", "Cool camera to -10°C", "Start guiding", and more!</TextBlock>
+                        <TextBlock TextWrapping="Wrap" FontSize="10" Opacity="0.5" Margin="0,10,0,0">With MCP enabled, you can ask the AI to: "Connect all equipment", "Take a 30s exposure of M31", "Cool camera to -10°C", "Start guiding", and more!</TextBlock>
                         
                         <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
                             <Button Content="Get Advanced API Plugin" Click="GetAdvancedAPIPlugin_Click" MinWidth="140"/>

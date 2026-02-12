@@ -14,6 +14,8 @@ namespace NINA.Plugin.AIAssistant.AI
         private IAIProvider? _activeProvider;
         private AIProviderType _activeProviderType;
         private readonly Dictionary<AIProviderType, IAIProvider> _providers;
+        private readonly Dictionary<AIProviderType, (string[] models, DateTime fetchedAt)> _modelCache = new();
+        private static readonly TimeSpan ModelCacheDuration = TimeSpan.FromHours(1);
 
         public AIService()
         {
@@ -23,8 +25,7 @@ namespace NINA.Plugin.AIAssistant.AI
                 { AIProviderType.OpenAI, new OpenAIProvider() },
                 { AIProviderType.Anthropic, new AnthropicProvider() },
                 { AIProviderType.Google, new GoogleProvider() },
-                { AIProviderType.Ollama, new OllamaProvider() },
-                { AIProviderType.OpenRouter, new OpenRouterProvider() }
+                { AIProviderType.Ollama, new OllamaProvider() }
             };
         }
 
@@ -153,15 +154,42 @@ namespace NINA.Plugin.AIAssistant.AI
         }
 
         /// <summary>
-        /// Get available models for a provider
+        /// Get available models for a provider (cached for 1 hour)
         /// </summary>
         public async Task<string[]> GetAvailableModelsAsync(AIProviderType providerType, CancellationToken cancellationToken = default)
         {
+            // Check cache first
+            if (_modelCache.TryGetValue(providerType, out var cached) && 
+                DateTime.UtcNow - cached.fetchedAt < ModelCacheDuration &&
+                cached.models.Length > 0)
+            {
+                Logger.Debug($"AI Service: Returning {cached.models.Length} cached models for {providerType}");
+                return cached.models;
+            }
+
             if (_providers.TryGetValue(providerType, out var provider))
             {
-                return await provider.GetAvailableModelsAsync(cancellationToken);
+                var models = await provider.GetAvailableModelsAsync(cancellationToken);
+                _modelCache[providerType] = (models, DateTime.UtcNow);
+                Logger.Info($"AI Service: Cached {models.Length} models for {providerType}");
+                return models;
             }
             return Array.Empty<string>();
+        }
+
+        /// <summary>
+        /// Force refresh model cache for a specific provider
+        /// </summary>
+        public void InvalidateModelCache(AIProviderType? providerType = null)
+        {
+            if (providerType.HasValue)
+            {
+                _modelCache.Remove(providerType.Value);
+            }
+            else
+            {
+                _modelCache.Clear();
+            }
         }
 
         /// <summary>

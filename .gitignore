@@ -63,3 +63,11 @@ UpgradeLog*.htm
 # Local settings
 *.user.config
 local.settings.json
+
+node_modules/
+.venv/
+package-lock.json
+*.zip
+manifest.schema.json
+validate-manifest.js
+package.json

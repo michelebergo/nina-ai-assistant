@@ -24,6 +24,7 @@ namespace NINA.Plugin.AIAssistant.AI
         private MCPConfig? _mcpConfig;
         private bool _mcpEnabled;
         private const string BaseUrl = "https://api.anthropic.com/v1";
+        private const string DefaultModel = "claude-sonnet-4-5-20250929";
         private const int MaxToolIterations = 10; // Prevent infinite loops
 
         public AIProviderType ProviderType => AIProviderType.Anthropic;
@@ -124,6 +125,7 @@ namespace NINA.Plugin.AIAssistant.AI
 
         private async Task<AIResponse> SendStandardRequestAsync(AIRequest request, CancellationToken cancellationToken)
         {
+            var model = _config!.ModelId ?? DefaultModel;
             var messages = new List<object>
             {
                 new { role = "user", content = request.Prompt }
@@ -131,8 +133,7 @@ namespace NINA.Plugin.AIAssistant.AI
 
             var requestBody = new
             {
-                // Latest: claude-sonnet-4.5 (Claude 4.5, superior), claude-sonnet-4-20250514 (Claude 4, May 2025), claude-3-7-sonnet-20250219
-                model = _config!.ModelId ?? "claude-sonnet-4.5",
+                model,
                 max_tokens = request.MaxTokens,
                 system = request.SystemPrompt ?? GetDefaultSystemPrompt(),
                 messages = messages
@@ -147,7 +148,33 @@ namespace NINA.Plugin.AIAssistant.AI
             if (!response.IsSuccessStatusCode)
             {
                 Logger.Error($"Anthropic API error: {responseContent}");
-                return new AIResponse { Success = false, Error = $"API Error: {response.StatusCode} - {responseContent}" };
+                var parsedError = ParseApiError(responseContent);
+                
+                // If model not found, retry with default model
+                if (parsedError.errorType == "not_found_error" && model != DefaultModel)
+                {
+                    Logger.Warning($"Model '{model}' not found, falling back to '{DefaultModel}'");
+                    var fallbackBody = new
+                    {
+                        model = DefaultModel,
+                        max_tokens = request.MaxTokens,
+                        system = request.SystemPrompt ?? GetDefaultSystemPrompt(),
+                        messages = messages
+                    };
+                    var fallbackJson = JsonConvert.SerializeObject(fallbackBody);
+                    var fallbackContent = new StringContent(fallbackJson, Encoding.UTF8, "application/json");
+                    var fallbackResponse = await _httpClient.PostAsync($"{BaseUrl}/messages", fallbackContent, cancellationToken);
+                    var fallbackResponseContent = await fallbackResponse.Content.ReadAsStringAsync(cancellationToken);
+                    if (fallbackResponse.IsSuccessStatusCode)
+                    {
+                        var result = ParseResponse(fallbackResponseContent);
+                        result.Content = $"⚠️ *Model '{model}' was not found. Used '{DefaultModel}' instead. Please update your model in plugin settings.*\n\n{result.Content}";
+                        return result;
+                    }
+                    return new AIResponse { Success = false, Error = FormatApiError(fallbackResponseContent) };
+                }
+                
+                return new AIResponse { Success = false, Error = FormatApiError(responseContent) };
             }
 
             return ParseResponse(responseContent);
@@ -183,6 +210,7 @@ namespace NINA.Plugin.AIAssistant.AI
             
             var allToolResults = new List<string>();
             int iterations = 0;
+            var model = _config!.ModelId ?? DefaultModel;
 
             while (iterations < MaxToolIterations)
             {
@@ -191,8 +219,7 @@ namespace NINA.Plugin.AIAssistant.AI
                 
                 var requestBody = new
                 {
-                    // Latest: claude-sonnet-4.5 (Claude 4.5) with extended tool use capability
-                    model = _config!.ModelId ?? "claude-sonnet-4.5",
+                    model,
                     max_tokens = request.MaxTokens,
                     system = systemPrompt,
                     tools = toolDefinitions,
@@ -208,7 +235,35 @@ namespace NINA.Plugin.AIAssistant.AI
                 if (!response.IsSuccessStatusCode)
                 {
                     Logger.Error($"Anthropic API error: {responseContent}");
-                    return new AIResponse { Success = false, Error = $"API Error: {response.StatusCode} - {responseContent}" };
+                    var parsedError = ParseApiError(responseContent);
+                    
+                    // If model not found on first iteration, retry with default model
+                    if (parsedError.errorType == "not_found_error" && model != DefaultModel && iterations == 1)
+                    {
+                        Logger.Warning($"Model '{model}' not found, falling back to '{DefaultModel}' for tool-calling flow");
+                        model = DefaultModel;
+                        // Rebuild request with default model
+                        var retryBody = new
+                        {
+                            model = DefaultModel,
+                            max_tokens = request.MaxTokens,
+                            system = systemPrompt,
+                            tools = toolDefinitions,
+                            messages = messages
+                        };
+                        json = JsonConvert.SerializeObject(retryBody);
+                        content = new StringContent(json, Encoding.UTF8, "application/json");
+                        response = await _httpClient.PostAsync($"{BaseUrl}/messages", content, cancellationToken);
+                        responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            return new AIResponse { Success = false, Error = FormatApiError(responseContent) };
+                        }
+                    }
+                    else
+                    {
+                        return new AIResponse { Success = false, Error = FormatApiError(responseContent) };
+                    }
                 }
 
                 var jsonResponse = JObject.Parse(responseContent);
@@ -330,7 +385,7 @@ namespace NINA.Plugin.AIAssistant.AI
 
         private string GetDefaultSystemPrompt()
         {
-            return "You are an expert astrophotography assistant for N.I.N.A. (Nighttime Imaging 'N' Astronomy). Help analyze images, suggest optimal settings, and provide intelligent guidance.";
+            return "You are an expert astrophotography assistant for N.I.N.A. (Nighttime Imaging 'N' Astronomy). Only answer astrophotography and astronomy questions. Never fabricate equipment specs or N.I.N.A. features. If unsure, say so.";
         }
 
         private string GetMCPSystemPrompt()
@@ -379,43 +434,48 @@ For example, if user says 'check equipment' or 'show status', USE nina_get_statu
         {
             try
             {
-                // Anthropic doesn't have a public models API endpoint
-                // Return curated list of known models with fallback
                 if (_httpClient == null || _config == null)
                     return GetDefaultModels();
 
-                // Try to validate API key by making a minimal request
-                var testRequest = new HttpRequestMessage(HttpMethod.Post, "https://api.anthropic.com/v1/messages")
-                {
-                    Headers = 
-                    {
-                        { "x-api-key", _config.ApiKey },
-                        { "anthropic-version", "2023-06-01" }
-                    },
-                    Content = new StringContent(
-                        JsonConvert.SerializeObject(new 
-                        { 
-                            model = "claude-sonnet-4.5",
-                            max_tokens = 1,
-                            messages = new[] { new { role = "user", content = "test" } }
-                        }),
-                        Encoding.UTF8,
-                        "application/json")
-                };
+                // Use Anthropic's /v1/models API to get available models dynamically
+                var request = new HttpRequestMessage(HttpMethod.Get, $"{BaseUrl}/models");
+                request.Headers.Add("x-api-key", _config.ApiKey);
+                request.Headers.Add("anthropic-version", "2023-06-01");
 
-                var response = await _httpClient.SendAsync(testRequest, cancellationToken);
+                var response = await _httpClient.SendAsync(request, cancellationToken);
                 
-                // If we get any response (even error), API key works - return full list
-                // 401 means bad key, anything else means key is valid
-                if (response.StatusCode != System.Net.HttpStatusCode.Unauthorized)
-                    return GetDefaultModels();
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync(cancellationToken);
+                    var json = JObject.Parse(content);
+                    var models = json["data"] as JArray;
+                    
+                    if (models != null && models.Count > 0)
+                    {
+                        var modelIds = models
+                            .Select(m => m["id"]?.ToString())
+                            .Where(id => !string.IsNullOrEmpty(id))
+                            .ToArray();
+                        
+                        if (modelIds.Length > 0)
+                        {
+                            Logger.Info($"Anthropic: Retrieved {modelIds.Length} models from API");
+                            return modelIds!;
+                        }
+                    }
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    Logger.Warning("Anthropic: Invalid API key");
+                    return new[] { DefaultModel };
+                }
                 
-                // Bad API key - return limited list
-                return new[] { "claude-sonnet-4.5" };
+                // Fallback to defaults
+                return GetDefaultModels();
             }
             catch (Exception ex)
             {
-                Logger.Warning($"Failed to validate Anthropic access: {ex.Message}");
+                Logger.Warning($"Failed to fetch Anthropic models: {ex.Message}");
                 return GetDefaultModels();
             }
         }
@@ -424,12 +484,48 @@ For example, if user says 'check equipment' or 'show status', USE nina_get_statu
         {
             return new[]
             {
-                "claude-sonnet-4.5",
+                "claude-sonnet-4-5-20250929",
                 "claude-sonnet-4-20250514",
-                "claude-3-7-sonnet-20250219",
-                "claude-3-5-sonnet-latest",
-                "claude-3-5-haiku-latest",
-                "claude-3-opus-latest"
+                "claude-opus-4-6",
+                "claude-opus-4-5-20251101",
+                "claude-haiku-4-5-20251001",
+                "claude-3-5-haiku-20241022"
+            };
+        }
+
+        /// <summary>
+        /// Parse Anthropic API error response to extract error type and message
+        /// </summary>
+        private (string errorType, string message) ParseApiError(string responseContent)
+        {
+            try
+            {
+                var errorJson = JObject.Parse(responseContent);
+                var errorType = errorJson["error"]?["type"]?.ToString() ?? "unknown";
+                var message = errorJson["error"]?["message"]?.ToString() ?? responseContent;
+                return (errorType, message);
+            }
+            catch
+            {
+                return ("unknown", responseContent);
+            }
+        }
+
+        /// <summary>
+        /// Format API error into a user-friendly message
+        /// </summary>
+        private string FormatApiError(string responseContent)
+        {
+            var (errorType, message) = ParseApiError(responseContent);
+            return errorType switch
+            {
+                "not_found_error" => $"Model not found: {message}. Please select a valid model in plugin settings.",
+                "authentication_error" => $"Invalid API key. Please check your Anthropic API key in plugin settings.",
+                "permission_error" => $"API key does not have permission. Check your Anthropic plan and API key.",
+                "rate_limit_error" => $"Rate limited by Anthropic. Please wait a moment and try again.",
+                "invalid_request_error" => $"Invalid request: {message}",
+                "overloaded_error" => $"Anthropic API is overloaded. Please try again shortly.",
+                _ => $"API Error ({errorType}): {message}"
             };
         }
     }
